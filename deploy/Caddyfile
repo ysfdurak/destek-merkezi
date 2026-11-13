@@ -1,0 +1,6 @@
+# Tek başına kurulum için Caddy ayarı: HTTPS sertifikasını otomatik alır ve yeniler.
+# Alan adını kendi adresinizle değiştirin; .env içindeki DESTEK_BASE_URL ile aynı olmalı.
+destek.sirketiniz.com.tr {
+	encode zstd gzip
+	reverse_proxy destek:8080
+}

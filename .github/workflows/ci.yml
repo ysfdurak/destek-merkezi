@@ -1,0 +1,46 @@
+name: Test ve derleme
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Arayüzü derle
+        run: npm run build
+      - name: Testler
+        run: npm test
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: İmajı derle
+        run: docker build -t destek-merkezi:ci .
+      - name: Konteyner denemesi (demo modu)
+        run: |
+          docker run -d --name destek -p 8080:8080 \
+            -e DESTEK_BASE_URL=https://destek.ornek.test -e DEMO_MODE=true destek-merkezi:ci
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8080/healthz && break; sleep 1; done
+          H='Host: destek.ornek.test'
+          curl -fs -H "$H" http://127.0.0.1:8080/ | grep -q '<div id="root">'
+          curl -fs -H "$H" http://127.0.0.1:8080/app.js -o /dev/null
+          curl -fs -H "$H" http://127.0.0.1:8080/api/startup | grep -q '"demo":true'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H "$H" http://127.0.0.1:8080/api/state)" = "401"
+          code=$(curl -s -o /dev/null -D headers.txt -w '%{http_code}' -H "$H" -H 'Origin: https://destek.ornek.test' \
+            -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:8080/api/demo)
+          test "$code" = "201"
+          grep -i '^set-cookie:' headers.txt | grep -q 'Secure'
+          COOKIE=$(grep -i '^set-cookie:' headers.txt | sed -E 's/^[Ss]et-[Cc]ookie: ([^;]+);.*/\1/' | paste -sd ';' -)
+          curl -fs -H "$H" -H "Cookie: $COOKIE" http://127.0.0.1:8080/api/state | grep -q '"isDemo":true'
+          docker exec destek sh -c 'ls /data/demo/*.sqlite'
+          docker inspect --format '{{.Config.User}}' destek | grep -q node
+          test "$(docker inspect --format '{{.State.Health.Status}}' destek)" != "unhealthy"
+      - name: Günlük
+        if: always()
+        run: docker logs destek || true

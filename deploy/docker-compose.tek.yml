@@ -1,0 +1,26 @@
+# Tek başına sunucu: Destek Merkezi + Caddy (otomatik Let's Encrypt HTTPS).
+# Önce deploy/Caddyfile içindeki alan adını kendi adresinizle değiştirin.
+#   cd deploy && docker compose -f docker-compose.tek.yml up -d --build
+services:
+  destek:
+    build: ..
+    env_file: ../.env
+    volumes:
+      - destek-data:/data
+    restart: unless-stopped
+  caddy:
+    image: caddy:2
+    depends_on: [destek]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+volumes:
+  destek-data: {}
+  caddy-data: {}
+  caddy-config: {}

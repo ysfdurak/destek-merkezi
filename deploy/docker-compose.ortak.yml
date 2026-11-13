@@ -1,0 +1,21 @@
+# ysfdurak.com ortak altyapısında çalıştırma.
+# Caddy (HTTPS) ortak altyapıda: github.com/ysfdurak/ysfdurak.com → sunucu/
+#   cd deploy && docker compose -f docker-compose.ortak.yml up -d --build
+# Destek Merkezi hiçbir portu dışarı açmaz; ortak Caddy "web" ağı üzerinden destek:8080'e ulaşır.
+services:
+  destek:
+    build: ..
+    container_name: destek
+    env_file: ../.env
+    volumes:
+      - destek-data:/data
+    restart: unless-stopped
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+
+volumes:
+  destek-data: {}

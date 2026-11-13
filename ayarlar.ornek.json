@@ -1,0 +1,20 @@
+{
+  "profil": "kucuk",
+  "host": "127.0.0.1",
+  "port": 8732,
+  "baseUrl": "http://127.0.0.1:8732",
+  "database": "veri/destek.sqlite",
+  "yedek": {
+    "acik": true,
+    "klasor": "yedek",
+    "saat": 2
+  },
+  "mail": {
+    "mode": "off",
+    "tenantId": "",
+    "clientId": "",
+    "sender": "",
+    "testRecipient": "",
+    "allowedRecipientDomains": []
+  }
+}
