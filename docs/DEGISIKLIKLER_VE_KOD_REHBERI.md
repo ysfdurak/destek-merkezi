@@ -1,5 +1,12 @@
 # Destek Merkezi · Değişiklikler ve kod rehberi
 
+## Okunabilirlik ve erişilebilirlik · 15 Kasım 2026 (1.4.2)
+
+- **Renk karşıtlığı:** `app/globals.css` içindeki soluk gri/yeşil yazı renkleri, açık zeminlerde (en koyusu `#e4eeea`) en az 4,6:1 karşıtlığa gelecek şekilde aynı tonda koyulaştırıldı; koyu zemindeki beyaz yazılara dokunulmadı. `--muted` `#5b696d` oldu; menüde seçili öğe `--teal-dark`.
+- **Yazı boyutu:** 10 pikselin altındaki tüm yazılar (tablo başlıkları, rozetler, dipnotlar; 57 yer) 10,5 piksele çekildi.
+- **Tablolar:** başlığı boş sütunlara ekran okuyucu için ad verildi (`.sr-only`: İşlemler, Bölüm, Bilgi).
+- Kontrol: axe (WCAG 2 A/AA) demo girişinde ve 10 ekranda masaüstü + telefon 0 ihlal; 44 test geçti.
+
 ## Yayın altyapısı · 13 Kasım 2026
 
 Uygulama GitHub'a ve ysfdurak.com sunucusuna hazırlandı. Testler 44 ve hepsi geçiyor.
