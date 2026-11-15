@@ -4,6 +4,8 @@ Bölümler arası işgücü desteğini kaydeden, karşı bölüme onaylatan ve p
 
 **Canlı demo:** https://destek.ysfdurak.com — giriş gerekmez. Kurgusal bir depo organizasyonuyla dolu, yalnızca sana ait bir alan açılır ve son kullanımdan 3 gün sonra silinir.
 
+**English:** https://destek.ysfdurak.com/?lang=en — the whole interface and the demo data open in English (sidebar button to switch back). Nasıl çalıştığı: [docs/CEVIRI.md](docs/CEVIRI.md).
+
 ![Genel bakış](docs/img/genel-bakis.webp)
 
 ## Neler yapar

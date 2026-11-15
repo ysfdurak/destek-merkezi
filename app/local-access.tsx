@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeftRight, LockKeyhole, PlayCircle, RotateCcw } from 'lucide-react';
+import LangSwitch from './lang-switch';
 
 export default function LocalAccess({ onReady }: { onReady: () => void }) {
   const [startup,setStartup] = useState<{setup:boolean;local:boolean;demo?:boolean;hasDemo?:boolean;ttlHours?:number}|null>(null);
@@ -45,6 +46,7 @@ export default function LocalAccess({ onReady }: { onReady: () => void }) {
           <li>Tüm kişi ve kayıtlar sentetiktir; kimseye e-posta gitmez.</li>
           <li>Alan, son kullanımdan {days} gün sonra tümüyle silinir.</li>
         </ul>
+        <LangSwitch/>
       </section>
     </main>;
   }

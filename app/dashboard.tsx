@@ -9,7 +9,7 @@ import OrgFilter, { orgDeptSet } from './org-filter';
 import { levels, plural, lower, rollup, ancestorAt } from '../lib/org.mjs';
 
 const fmt = (x: number, d = 0) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: d }).format(x);
-const pct = (x: number | null) => x == null ? '—' : '%' + fmt(x * 100, 1);
+const pct = (x: number | null) => x == null ? '—' : (globalThis as any).__DIL === 'en' ? fmt(x * 100, 1) + '%' : '%' + fmt(x * 100, 1);
 const C = { final: '#1f7a64', pending: '#a9d4c3', grid: '#e8eeea', muted: '#9aa8a0' };
 const readPref = () => { try { return localStorage.getItem('destek.dashboard.mismatch') === '1'; } catch { return false; } };
 const writePref = (v: boolean) => { try { localStorage.setItem('destek.dashboard.mismatch', v ? '1' : '0'); } catch { /* izin yoksa yalnızca bu oturumda kalır */ } };

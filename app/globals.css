@@ -154,3 +154,20 @@ table.sortable th.sorted{color:#1e7661}
 .demo-notes{margin:0;padding-left:18px;color:var(--muted,#5b6b6a);font-size:13px;line-height:1.55}
 .demo-notes li+li{margin-top:6px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Dil seçimi (Türkçe / English) */
+.lang-switch {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  margin: 0 0 10px;
+  opacity: 0.75;
+  padding: 4px 10px;
+}
+.lang-switch:hover { opacity: 1; }
+.local-access-card .lang-switch { margin-top: 16px; }

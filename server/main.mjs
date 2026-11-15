@@ -11,6 +11,7 @@ import { openStore } from './store.mjs';
 import { graphClient, mailWorker, validAddress } from './mail.mjs';
 import { backupWorker } from './backup.mjs';
 import { DEMO_COOKIE, demoManager } from './demo.mjs';
+import { langOf, tx } from './i18n.mjs';
 
 // Kurulum profilleri: işletme büyüklüğüne göre hazır ayarlar. ayarlar.json içindeki 'profil' alanıyla seçilir.
 export const PROFILES = {
@@ -108,6 +109,8 @@ export function createApplication(config, { send = null } = {}) {
     const nativeAccess = res.req.headers['x-destek-access'] === '1';
     const type = nativeAccess ? 'text/plain' : 'application/json';
     res.writeHead(status, { 'Content-Type':type+'; charset=utf-8', 'Cache-Control':'no-store' });
+    // İngilizce arayüzden gelen istekte hata iletisi İngilizce döner (Access istemcisi Türkçe kalır)
+    if (!nativeAccess && typeof data?.error === 'string') data = { ...data, error: tx(langOf(res.req), data.error) };
     res.end(nativeAccess ? accessResponse(data,res.req.url) : JSON.stringify(data));
   }
   const readCookie = (req,name) => new RegExp(`(?:^|;\\s*)${name}=([a-f0-9]{64})(?:;|$)`).exec(req.headers.cookie ?? '')?.[1];
@@ -185,7 +188,7 @@ export function createApplication(config, { send = null } = {}) {
           return json(res,200,{ok:true});
         }
         let created;
-        try { created = demo.create(clientIp(req)); }
+        try { created = demo.create(clientIp(req), langOf(req)); }
         catch (error) { throw new RequestError(error.status ?? 500, error.status ? error.message : 'Demo alanı açılamadı.'); }
         store = created.store;
         addCookie(res,DEMO_COOKIE,created.token,demo.ttlHours*3600);

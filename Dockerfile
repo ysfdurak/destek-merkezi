@@ -11,6 +11,7 @@ RUN npm ci --no-audit --no-fund
 COPY app ./app
 COPY lib ./lib
 COPY public ./public
+COPY ceviri ./ceviri
 RUN npm run build
 
 # 2. aşama: yalnızca sunucu. Sunucu Node'un yerleşik modülleriyle çalışır; node_modules gerekmez.
