@@ -7,7 +7,7 @@
     "xlsx": "^0.18.5"
   },
   "name": "destek-merkezi",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "build": "esbuild app/entry.tsx --bundle --minify --legal-comments=external --target=es2022 --outfile=public/app.js",
