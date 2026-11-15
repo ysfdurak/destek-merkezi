@@ -22,14 +22,15 @@ export function donustur(code, dict, runtime) {
     if (it.kind === 'str' && it.key === 'tr-TR') { edits.push({ s: n.start, e: n.end, r: () => '__L()' }); continue; }
     if (!dict.has(it.key)) continue;
     const k = JSON.stringify(it.key);
-    if (it.kind === 'str') edits.push({ s: n.start, e: n.end, r: () => `__t(${k})` });
+    if (it.kind === 'str') edits.push({ s: n.start, e: n.end, r: (render) => (it.prev ? `__tn((${render(it.prev.start, it.prev.end)}), ${k})` : `__t(${k})`) });
     else if (it.kind === 'key') edits.push({ s: n.start, e: n.end, r: () => `[__t(${k})]` });
     else if (it.kind === 'jsxattr') edits.push({ s: n.start, e: n.end, r: () => `{__t(${k})}` });
     else if (it.kind === 'jsxtext') {
       const lead = n.value.match(/^\s*/)[0], trail = n.value.match(/\s*$/)[0];
       const keepL = /\n/.test(lead) ? '' : lead ? '{" "}' : '';
       const keepT = /\n/.test(trail) ? '' : trail ? '{" "}' : '';
-      edits.push({ s: n.start, e: n.end, r: () => `${keepL}{__t(${k})}${keepT}` });
+      const pv = it.prev;
+          edits.push({ s: n.start, e: n.end, r: (render) => pv ? `${keepL}{__tn((${render(pv.start, pv.end)}), ${k})}${keepT}` : `${keepL}{__t(${k})}${keepT}` });
     } else if (it.kind === 'tpl') {
       edits.push({ s: n.start, e: n.end, r: (render) => `__tt(${k}${n.expressions.map((x) => ', (' + render(x.start, x.end) + ')').join('')})` });
     }
@@ -45,5 +46,5 @@ export function donustur(code, dict, runtime) {
     }
     return res + code.slice(pos, to);
   };
-  return `import { __t, __tt, __L } from ${JSON.stringify(runtime)};\n` + render(0, code.length);
+  return `import { __t, __tt, __tn, __L } from ${JSON.stringify(runtime)};\n` + render(0, code.length);
 }

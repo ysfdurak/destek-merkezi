@@ -36,3 +36,35 @@ test('demo verisi İngilizce açılır; kimlik, kod ve durumlar değişmez', () 
   en.supports?.forEach((r, i) => assert.equal(r.status, s.supports[i].status));
   assert.deepEqual(translateState('tr', s), s);
 });
+
+test('İngilizcede sayı 1 ise çoğul isim tekile döner', async () => {
+  const { fill, singularize } = await import('../lib/i18n/translate.mjs');
+  assert.equal(fill('{0} tasks overdue', [1]), '1 task overdue');
+  assert.equal(fill('{0} tasks overdue', [3]), '3 tasks overdue');
+  assert.equal(fill('{0} of {1} records', [1, 1]), '1 of 1 record');
+  assert.equal(singularize('timesheet warnings'), 'timesheet warning');
+  assert.equal(singularize('People'), 'Person');
+  assert.equal(singularize('In progress'), 'In progress');
+});
+
+test('derleme: sayının ardındaki JSX metni __tn ile çevrilir', async () => {
+  const { donustur } = await import('../ceviri/donustur.mjs');
+  const out = donustur('const a = <p><b>{list.length} puantaj uyarısı</b><strong>{n}<em>uyarı</em></strong></p>;', new Set(['puantaj uyarısı', 'uyarı']), 'rt');
+  assert.match(out, /__tn\(\(list\.length\), "puantaj uyarısı"\)/);
+  assert.match(out, /__tn\(\(n\), "uyarı"\)/);
+});
+
+test('derleme: sayıdan sonra gelen ayrı metin ve etiket biçimleri de __tn alır', async () => {
+  const { donustur } = await import('../ceviri/donustur.mjs');
+  const d = new Set([' iş', 'geciken iş']);
+  const out = donustur(`const a = <p><span>\n{x.length}\n{' iş'}\n</span><b><strong>{s.late}</strong>\n<small>geciken iş</small></b><i>{f(x)}{' iş'}</i></p>;`, d, 'rt');
+  assert.match(out, /__tn\(\(x\.length\), " iş"\)/);
+  assert.match(out, /__tn\(\(s\.late\), "geciken iş"\)/);
+  assert.match(out, /\{__t\(" iş"\)\}<\/i>/); // çağrı ifadesi iki kez yazılmaz
+});
+
+test('derleme: sayı + metin birleştirmesi de __tn alır', async () => {
+  const { donustur } = await import('../ceviri/donustur.mjs');
+  const out = donustur("const a = t.count + ' kez';", new Set([' kez']), 'rt');
+  assert.match(out, /t\.count \+ __tn\(\(t\.count\), " kez"\)/);
+});

@@ -2,7 +2,7 @@
 // Seçim çereze yazılır; sunucu da (giriş ve hata sayfaları, demo verisi) aynı çerezi okur.
 // Metinler kaynakta Türkçe durur; derlemede ceviri/derle.mjs onları __t / __tt çağrılarına çevirir.
 import en from '../lib/i18n/en.json';
-import { translateText } from '../lib/i18n/translate.mjs';
+import { translateText, fill, singularize } from '../lib/i18n/translate.mjs';
 
 function pick() {
   try {
@@ -27,8 +27,13 @@ globalThis.__DIL = LANG;
 export const __t = (s) => (D && Object.prototype.hasOwnProperty.call(D, s) ? D[s] : s);
 /** Şablon: anahtar "a {0} b", değerler sırayla */
 export const __tt = (key, ...v) => {
-  const f = D && Object.prototype.hasOwnProperty.call(D, key) ? D[key] : key;
-  return f.replace(/\{(\d+)\}/g, (m, i) => (v[+i] === undefined ? m : String(v[+i])));
+  if (D && Object.prototype.hasOwnProperty.call(D, key)) return fill(D[key], v);
+  return key.replace(/\{(\d+)\}/g, (m, i) => (v[+i] === undefined ? m : String(v[+i])));
+};
+/** Bir sayının hemen ardındaki JSX metni ({n} görev): İngilizcede n = 1 ise çoğul isim tekile döner */
+export const __tn = (n, s) => {
+  const t = __t(s);
+  return D && String(n).trim() === '1' ? singularize(t) : t;
 };
 /** Tarih/sayı biçimi için yerel ayar */
 export const __L = () => (LANG === 'en' ? 'en-GB' : 'tr-TR');

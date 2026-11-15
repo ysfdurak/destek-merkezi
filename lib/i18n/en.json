@@ -862,7 +862,7 @@
  "gösteriliyor;": "shown;",
  "gün": "days",
  "gün sonra tümüyle silinir.": "days after last use.",
- "gün sonunda otomatik onay": "days until automatic approval",
+ "gün sonunda otomatik onay": "days, then automatic approval:",
  "gün, ortanca": "days, median",
  "hafta": "weeks",
  "hata": "errors",
@@ -1015,5 +1015,8 @@
  "— bağlı değil —": "— not linked —",
  "— seçilmedi —": "— not selected —",
  "— seçin —": "— choose —",
- "… ve {0} hata daha.": "… and {0} more errors."
+ "… ve {0} hata daha.": "… and {0} more errors.",
+ "AD": "NAME",
+ "E-posta": "Email",
+ "saat": "hours"
 }
