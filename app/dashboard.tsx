@@ -9,7 +9,7 @@ import OrgFilter, { orgDeptSet } from './org-filter';
 import { levels, plural, lower, rollup, ancestorAt } from '../lib/org.mjs';
 
 const fmt = (x: number, d = 0) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: d }).format(x);
-const pct = (x: number | null) => x == null ? '—' : '%' + fmt(x * 100, 1);
+const pct = (x: number | null) => x == null ? '—' : (globalThis as any).__DIL === 'en' ? fmt(x * 100, 1) + '%' : '%' + fmt(x * 100, 1);
 const C = { final: '#1f7a64', pending: '#a9d4c3', grid: '#e8eeea', muted: '#9aa8a0' };
 const readPref = () => { try { return localStorage.getItem('destek.dashboard.mismatch') === '1'; } catch { return false; } };
 const writePref = (v: boolean) => { try { localStorage.setItem('destek.dashboard.mismatch', v ? '1' : '0'); } catch { /* izin yoksa yalnızca bu oturumda kalır */ } };
@@ -76,7 +76,7 @@ function DeptTable({ rows, deptName, q, sortKey, setSortKey, limit, G = 'Bölüm
   const val = (x: any, k: string) => k === 'total' ? x.givenFinal + x.receivedFinal : x[k];
   const list = rows.filter((x: any) => !q || deptName(x.deptId).toLocaleLowerCase('tr').includes(q.toLocaleLowerCase('tr'))).sort((a: any, b: any) => val(b, sortKey) - val(a, sortKey));
   const shown = q ? list : list.slice(0, limit);
-  return <><div className="table-scroll"><table className="sortable"><thead><tr><th>{G.toLocaleUpperCase('tr')}</th>{cols.map(([k, n]) => <th key={k} className={sortKey === k ? 'sorted' : ''} onClick={() => setSortKey(sortKey === k ? 'total' : k)}>{n}{sortKey === k ? ' ↓' : ''}</th>)}</tr></thead>
+  return <><div className="table-scroll"><table className="sortable"><thead><tr><th>{G.toLocaleUpperCase('tr-TR')}</th>{cols.map(([k, n]) => <th key={k} className={sortKey === k ? 'sorted' : ''} onClick={() => setSortKey(sortKey === k ? 'total' : k)}>{n}{sortKey === k ? ' ↓' : ''}</th>)}</tr></thead>
     <tbody>{shown.map((x: any) => <tr key={x.deptId}><td><strong>{deptName(x.deptId)}</strong></td><td>{x.givenFinal}</td><td className="teal-text">{x.receivedFinal}</td><td>{x.people}</td><td>{x.pending}</td><td>{x.rejected}</td><td>{x.cancelled}</td></tr>)}</tbody></table></div>
     {shown.length < list.length && <p className="footnote panel-pad">{shown.length} / {list.length} {lower(G)} gösteriliyor. Aramayla veya "Gösterim" seçeneğiyle diğerlerini görün.</p>}</>;
 }

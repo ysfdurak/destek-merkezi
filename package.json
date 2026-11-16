@@ -7,14 +7,19 @@
     "xlsx": "^0.18.5"
   },
   "name": "destek-merkezi",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "private": true,
   "scripts": {
-    "build": "esbuild app/entry.tsx --bundle --minify --legal-comments=external --target=es2022 --outfile=public/app.js",
+    "build": "node ceviri/derle.mjs",
     "test": "node --test tests/*.test.mjs",
     "start": "node server/main.mjs --open"
   },
   "engines": {
     "node": ">=24 <25"
+  },
+  "devDependencies": {
+    "acorn": "^8.19.0",
+    "acorn-jsx": "^5.3.2",
+    "acorn-walk": "^8.3.5"
   }
 }

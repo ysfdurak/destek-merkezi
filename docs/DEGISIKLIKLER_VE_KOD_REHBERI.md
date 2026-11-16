@@ -1,5 +1,13 @@
 # Destek Merkezi · Değişiklikler ve kod rehberi
 
+## İngilizce arayüz · 15 Kasım 2026 (1.5.0)
+
+- **Ne:** `?lang=en` ya da kenar çubuğundaki **English** düğmesiyle tüm arayüz, raporlar, Excel çıktıları ve sunucu hata iletileri İngilizce; İngilizce sayfadan açılan demo alanı İngilizce örnek verilerle gelir.
+- **Nasıl:** Kaynak Türkçe kaldı. `npm run build` artık `ceviri/derle.mjs`'i çalıştırır: esbuild derlerken sözlükte (`lib/i18n/en.json`, ~1.000 kayıt) karşılığı olan metinleri dile göre seçilen çağrılara çevirir. Sunucu aynı sözlüğü `server/i18n.mjs` ile kullanır. Ayrıntı ve dikkat edilecekler: [CEVIRI.md](CEVIRI.md).
+- **Kod değişiklikleri:** `lib/org.mjs` çoğul/küçük harf kuralı dile bağlı; yüzde biçimi dile bağlı; `lib/import.mjs`'e İngilizce eş adlar (`staff id`, `hours`, `working time`); `server/demo.mjs` dil parametresi.
+- **Türkçe kalan:** Access istemcisi, e-postalar.
+- Kontrol: 48 test (4'ü yeni) geçti; demo sunucusunda 11 ekran İngilizce tarandı, sayfa hatası yok.
+
 ## Okunabilirlik ve erişilebilirlik · 15 Kasım 2026 (1.4.2)
 
 - **Renk karşıtlığı:** `app/globals.css` içindeki soluk gri/yeşil yazı renkleri, açık zeminlerde (en koyusu `#e4eeea`) en az 4,6:1 karşıtlığa gelecek şekilde aynı tonda koyulaştırıldı; koyu zemindeki beyaz yazılara dokunulmadı. `--muted` `#5b696d` oldu; menüde seçili öğe `--teal-dark`.

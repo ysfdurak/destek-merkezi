@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { openStore } from './store.mjs';
 import { sampleHistory, seed, today } from '../lib/domain.mjs';
+import { translateState } from './i18n.mjs';
 
 const FILE = /^[a-f0-9]{32}\.sqlite$/;
 export const DEMO_COOKIE = 'destek_demo';
@@ -60,7 +61,7 @@ export function demoManager({ dir, ttlHours = 72, max = 200, perIpHour = 10, pas
     return entry.store;
   }
 
-  function create(ip) {
+  function create(ip, lang = 'tr') {
     let limit = created.get(ip);
     if (!limit || limit.until < Date.now()) limit = { count: 0, until: Date.now() + 3600000 };
     if (limit.count >= perIpHour) throw Object.assign(new Error('Bu bağlantıdan çok fazla demo alanı açıldı. Bir saat sonra yeniden deneyin.'), { status: 429 });
@@ -77,7 +78,8 @@ export function demoManager({ dir, ttlHours = 72, max = 200, perIpHour = 10, pas
     state.isDemo = true;
     sampleHistory(state);
     // Demo kullanıcısının parolası yoktur (rastgele, kimseye gösterilmez); alana yalnızca çerezle girilir.
-    store.initialize(id, state, passwordHash(randomBytes(24).toString('hex')));
+    // İngilizce arayüzden açılan alan İngilizce örnek verilerle gelir (birim, kişi rolleri, açıklamalar, geçmiş)
+    store.initialize(id, translateState(lang, state), passwordHash(randomBytes(24).toString('hex')));
     open.set(name, { store, used: Date.now() });
     count('olusturma');
     return { token, store, userId: id };
