@@ -78,7 +78,7 @@ npm start            # http://127.0.0.1:8732
 npm run build && npm test
 ```
 
-44 test şunları kapsar:
+52 test şunları kapsar:
 
 - oturum ve bölüm yetkisi
 - destek, onay ve geri çekme akışı
@@ -90,6 +90,16 @@ npm run build && npm test
 - demo alanlarının birbirinden ayrılması ve sınırları
 
 GitHub Actions her gönderimde testleri çalıştırır, Docker imajını derler ve konteyneri demo modunda dener.
+
+## English
+
+**Destek Merkezi** (Support Centre) records inter-department workforce support in shift-based operations, gets each record approved by the receiving department and checks it against attendance. It is built for warehouses and plants where requests arrive over WhatsApp and records are entered days later.
+
+- **Try it:** https://destek.ysfdurak.com/?lang=en — no sign-in; you get your own workspace with a fictional warehouse organisation in English, deleted 3 days after last use. The whole interface, reports and demo data are in English (sidebar button to switch back).
+- **Features:** shift-based fixed durations, bulk and retroactive entry, same-day duplicate block, approval/rejection/withdrawal, mismatches with attendance, a hierarchy defined by the business (up to 6 levels), dashboard, six reports to Excel/PDF, attendance import from Excel, role-based access.
+- **Stack:** Node.js 24 with built-in modules only (`node:sqlite`, `node:http`), SQLite, React + TypeScript bundled with esbuild, optional Microsoft Access client. Business rules live in one core (`lib/domain.mjs`).
+- **Run locally:** `npm ci && npm run build && cp ayarlar.ornek.json ayarlar.json && npm start` → http://127.0.0.1:8732. Server set-up: [KURULUM.md](KURULUM.md) (Windows) and [docs/SUNUCU_KURULUMU.md](docs/SUNUCU_KURULUMU.md) (Docker / VPS).
+- **Tests:** `npm run build && npm test` (52 tests).
 
 ## Bilinen konular
 
