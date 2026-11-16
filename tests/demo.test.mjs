@@ -124,3 +124,11 @@ test('ortam değişkenlerinden Docker ayarı', () => {
   // Vekilsiz düz HTTP ile https adresi kabul edilmez.
   assert.throws(() => createApplication({ baseUrl: 'https://destek.ornek.test', database: ':memory:', yedek: { acik: false } }), /baseUrl/);
 });
+
+test('demo giriş sayfası arama ve paylaşım etiketleriyle döner', async t => {
+  const { call } = await start(t);
+  const page = await call('/');
+  assert.equal(page.status, 200);
+  assert.match(page.text, /<link rel="canonical" href="https:\/\/destek\.ornek\.test\/">/);
+  assert.match(page.text, /<meta property="og:title"/);
+});

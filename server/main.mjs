@@ -54,6 +54,31 @@ async function readJson(req) {
   }
 }
 
+// Demo sunucusunun arama ve paylaşım etiketleri (ör. destek.ysfdurak.com). Adres ayarlardaki baseUrl'den gelir.
+export function seoHead(baseUrl) {
+  const esc = v => String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const url = new URL('/', baseUrl).href;
+  const title = 'Destek Merkezi · Bölümler arası işgücü desteği takibi';
+  const desc = 'Vardiyalı operasyonlarda bölümler arası personel desteğini kaydeden, karşı bölüme onaylatan ve puantajla karşılaştıran ücretsiz uygulama. Örnek verili demoyu deneyin.';
+  const image = 'https://ysfdurak.com/img/destek-merkezi/og.jpg';
+  return [
+    `<title>${esc(title)}</title>`,
+    `<meta name="description" content="${esc(desc)}">`,
+    `<link rel="canonical" href="${esc(url)}">`,
+    `<link rel="alternate" hreflang="tr" href="${esc(url)}">`,
+    `<link rel="alternate" hreflang="en" href="${esc(url)}?lang=en">`,
+    `<link rel="alternate" hreflang="x-default" href="${esc(url)}">`,
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:site_name" content="ysfdurak.com">`,
+    `<meta property="og:locale" content="tr_TR">`,
+    `<meta property="og:title" content="${esc(title)}">`,
+    `<meta property="og:description" content="${esc(desc)}">`,
+    `<meta property="og:url" content="${esc(url)}">`,
+    `<meta property="og:image" content="${esc(image)}">`,
+    `<meta name="twitter:card" content="summary_large_image">`
+  ].join('\n');
+}
+
 export function createApplication(config, { send = null } = {}) {
   const host = config.host ?? '127.0.0.1';
   const port = config.port ?? 8732;
@@ -167,7 +192,9 @@ export function createApplication(config, { send = null } = {}) {
       const path = new URL(req.url,baseUrl).pathname;
       if (req.method === 'GET' && assets.has(path)) {
         const [file,type] = assets.get(path);
-        const body = readFileSync(resolve(ROOT,'public',file));
+        let body = readFileSync(resolve(ROOT,'public',file));
+        // Herkese açık demoda (DEMO_MODE) giriş sayfasına arama ve paylaşım etiketleri eklenir. Kurum kurulumunda eklenmez.
+        if (demo && file === 'index.html') body = body.toString('utf8').replace('<title>Destek Merkezi</title>', seoHead(baseUrl));
         res.writeHead(200, { 'Content-Type':type, 'Cache-Control':'no-cache' });
         res.end(body);
         return;
