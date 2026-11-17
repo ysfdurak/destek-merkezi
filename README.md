@@ -107,3 +107,29 @@ GitHub Actions her gönderimde testleri çalıştırır, Docker imajını derler
 - Yetkiler 1. düzey birimlere (ör. bölüm) verilir. Müdürlük düzeyinde yetki henüz yok.
 
 Bağımlılıkların lisans metinleri `lisanslar/` klasöründedir.
+
+## Lisans
+
+Bu proje [PolyForm Shield 1.0.0](LICENSE.md) lisansıyla yayınlanır. Kaynak kodu açıktır, ancak resmi anlamda bir "açık kaynak" lisansı değildir.
+
+- **Serbest:** Kişiler, okullar ve şirketler kendi işlerinde ücretsiz kullanabilir, değiştirebilir ve kendi bilgisayarlarına ya da sunucularına kurabilir. İzin almak gerekmez.
+- **Yazılı izin gerekir:** Yazılımı satmak, adını değiştirip ürün gibi sunmak ya da bununla (ücretsiz olsa bile) rakip bir ürün veya hizmet sunmak.
+- **Garanti yok:** Yazılım olduğu gibi sunulur. Bağlayıcı olan İngilizce lisans metnidir.
+- Üçüncü taraf bileşenler kendi lisanslarına tabidir.
+
+**Kurum içinde kurulum:** Windows sunucusu için [KURULUM.md](KURULUM.md), Docker ve kurum modu için [docs/SUNUCU_KURULUMU.md](docs/SUNUCU_KURULUMU.md).
+
+Kurumunuzda kullanıyorsanız haber verirseniz sevinirim: kurulumda yardımcı olabilir, kurumunuza özel ihtiyaçları birlikte değerlendirebiliriz. İletişim: iletisim@ysfdurak.com
+
+### License (English)
+
+Released under [PolyForm Shield 1.0.0](LICENSE.md). The source is available, but this is not an OSI "open source" licence.
+
+- **Free:** individuals, schools and companies may use it in their own work, change it and run it on their own computers or servers. No permission needed.
+- **Needs written permission:** selling it, rebranding it as a product, or providing a product or service that competes with it (even free of charge).
+- **No warranty:** provided as is. The English licence text is binding.
+- Third-party components keep their own licences.
+
+**Installing it in your organisation:** [KURULUM.md](KURULUM.md) for a Windows server, [docs/SUNUCU_KURULUMU.md](docs/SUNUCU_KURULUMU.md) for Docker and company mode (Turkish).
+
+Using it in your organisation? I'd be glad to hear from you: I can help with setup and look at your organisation's needs together. Contact: contact@ysfdurak.com
