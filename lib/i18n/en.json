@@ -791,7 +791,7 @@
  "Vazgeç": "Cancel",
  "Veren": "Giver",
  "Veren ": "Giver ",
- "Veren \\ Alan": "Giver \\\\ Receiver",
+ "Veren \\ Alan": "Giver \\ Receiver",
  "Veren → alan (kesinleşen kayıt)": "Giver → receiver (finalised records)",
  "Veren-alan matrisi": "Giver-receiver matrix",
  "Veri": "Data",
@@ -884,7 +884,7 @@
  "puantaj uyarısı": "timesheet warnings",
  "saat kala": "hours before",
  "saat ·": "hours ·",
- "saatte hatırlatma taslağı hazırlanır.": "hours before, a reminder draft is prepared.",
+ "saatte hatırlatma taslağı hazırlanır.": "hours before the deadline, a reminder draft is prepared.",
  "satır atlandı": "rows skipped",
  "satır hazır ·": "rows ready ·",
  "satır okundu · Aynı anahtara ait mevcut kayıtlar güncellenir.": "rows read · Existing records with the same key are updated.",
@@ -892,7 +892,7 @@
  "seçildi": "selected",
  "sistem onayı ·": "system approval ·",
  "takvim günü": "calendar days",
- "takvim günü sonunda bekleyen kayıtlar": "calendar days, pending records",
+ "takvim günü sonunda bekleyen kayıtlar": "calendar days later, pending records",
  "tanesi gösteriliyor. Tamamı Excel'deki \"Destek matrisi\" sayfasında.": "are shown. All of them are on the \"Support matrix\" sheet in Excel.",
  "tanesi inceleme bekliyor": "waiting for review",
  "tanımlı değil.": "defined yet.",
@@ -1019,5 +1019,7 @@
  "AD": "NAME",
  "E-posta": "Email",
  "saat": "hours",
- "Yönetim ve raporlar": "Management and reports"
+ "Yönetim ve raporlar": "Management and reports",
+ "VEREN \\ ALAN": "GIVER \\ RECEIVER",
+ ". Son": ". In the last"
 }
