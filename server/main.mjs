@@ -128,7 +128,12 @@ export function createApplication(config, { send = null } = {}) {
     ['/', ['index.html','text/html; charset=utf-8']],
     ['/app.js', ['app.js','text/javascript; charset=utf-8']],
     ['/app.css', ['app.css','text/css; charset=utf-8']],
-    ['/favicon.svg', ['favicon.svg','image/svg+xml']]
+    ['/favicon.svg', ['favicon.svg','image/svg+xml']],
+    // Yazı tipleri sunucudan (dış adrese istek yok): DM Sans ve Manrope, SIL OFL 1.1
+    ['/fonts/dm-sans-latin-wght-normal.woff2', ['fonts/dm-sans-latin-wght-normal.woff2','font/woff2']],
+    ['/fonts/dm-sans-latin-ext-wght-normal.woff2', ['fonts/dm-sans-latin-ext-wght-normal.woff2','font/woff2']],
+    ['/fonts/manrope-latin-wght-normal.woff2', ['fonts/manrope-latin-wght-normal.woff2','font/woff2']],
+    ['/fonts/manrope-latin-ext-wght-normal.woff2', ['fonts/manrope-latin-ext-wght-normal.woff2','font/woff2']]
   ]);
   function json(res,status,data) {
     const nativeAccess = res.req.headers['x-destek-access'] === '1';
