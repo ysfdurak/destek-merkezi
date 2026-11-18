@@ -27,6 +27,7 @@ const ceviri = {
 await build({
   entryPoints: [path.join(root, 'app/entry.tsx')],
   bundle: true, minify: true, legalComments: 'external', target: 'es2022',
+  external: ['/fonts/*'], // yazı tipleri sunucudan /fonts/ adresiyle gelir (server/main.mjs)
   outfile: path.join(root, 'public/app.js'),
   plugins: [ceviri],
   logLevel: 'info',
