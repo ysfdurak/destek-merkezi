@@ -1021,5 +1021,19 @@
  "saat": "hours",
  "Yönetim ve raporlar": "Management and reports",
  "VEREN \\ ALAN": "GIVER \\ RECEIVER",
- ". Son": ". In the last"
+ ". Son": ". In the last",
+ "Ne zamandır bekliyor": "Waiting for",
+ "1 saatten az": "Less than 1 hour",
+ " saattir": " hours",
+ " gündür": " days",
+ "Onaya gönderildi: ": "Sent for approval: ",
+ "Kimden işlem bekleniyor": "Who needs to act",
+ "Bölüm yetkilisi olarak senden": "You, as department manager",
+ "Toplam saate etkisi": "Effect on total hours",
+ "Planlanan kayıt; gerçekleşince sayılır": "Planned record; counted once realized",
+ "Uyumsuzluk çözülmeden toplam saate sayılmaz": "Not counted in total hours until the mismatch is resolved",
+ "Onaylanırsa uyumsuzluğa rağmen sayılır": "If approved, counted despite the mismatch",
+ "Onaylanırsa toplam saate eklenir": "If approved, added to total hours",
+ " sa · ": " h · ",
+ " kişi": " people"
 }

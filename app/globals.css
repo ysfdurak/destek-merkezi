@@ -215,3 +215,11 @@ table.sortable th.sorted{color:#1e7661}
 .sidebar nav details.nav-more>summary:hover{background:rgba(8,127,114,.06)}
 .sidebar nav details.nav-more[open]>summary{color:var(--ink)}
 .sidebar nav details.nav-more>button{padding-left:22px}
+
+/* Onay kartı: bekleme süresi, işlem bekleyen ve toplam saate etkisi bir arada */
+.approval-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0 4px;padding:0}
+.approval-facts>div{border:1px solid var(--line,#dde3e8);border-radius:10px;padding:8px 10px;background:var(--soft,#f7f9fa)}
+.approval-facts>div.warn{border-color:#e7b65a;background:#fff8e8}
+.approval-facts dt{font-size:12px;font-weight:600;color:var(--muted,#5b6b76);margin:0 0 2px}
+.approval-facts dd{margin:0;font-weight:600;font-size:14px}
+.approval-facts small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5b6b76);margin-top:2px}
