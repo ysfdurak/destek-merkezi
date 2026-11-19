@@ -2,6 +2,8 @@
 
 ## Başka cihazdan giriş HTTPS ister · 19 Kasım 2026 (1.6.0)
 
+- **Sahte IP başlığı:** Sunucu (VPS) demosunda IP başına saatlik demo alanı sınırı `CF-Connecting-IP` / `X-Forwarded-For` başlığının ilk değerinden okunuyordu; alan adı Cloudflare'den geçmiyorsa herkes bu başlığı yazıp sınırı aşabilirdi. `server/gercek-ip.mjs` başlıkları yalnız güvenilen vekilden (özel ağdaki Caddy, Cloudflare aralıkları) kabul eder. Test: `tests/gercek-ip.test.mjs`.
+
 - **Önceki durum:** Küçük işletme profili yerel ağa HTTP ile açılabiliyordu. Telefondan veya ikinci bilgisayardan girişte parola ve oturum çerezi ağda şifresiz gidiyordu.
 - **Şimdi:** HTTPS'siz kurulumda yalnız uygulamanın kurulu olduğu bilgisayardan giriş yapılır. Başka bir cihaz giriş ekranında "bağlantı şifreli değil, https:// adresini iste" uyarısını görür; giriş ve bütün API istekleri `HTTPS_REQUIRED` iletisiyle reddedilir. Daha önce alınmış bir oturum çerezi de HTTP üzerinden işe yaramaz.
 - **HTTPS kolaylaştı:** `tls.pfx` + `tls.parola` ile Windows'ta PowerShell'le üretilen tek sertifika dosyası kullanılabilir (KURULUM.md). PEM (`tls.key` + `tls.cert`) desteği sürer.

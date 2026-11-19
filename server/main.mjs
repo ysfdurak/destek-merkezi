@@ -6,6 +6,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 import { createHash, randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { networkInterfaces } from 'node:os';
+import { gercekIp } from './gercek-ip.mjs';
 import { fileURLToPath } from 'node:url';
 import { applyAction, record, sampleHistory, scoped, seed } from '../lib/domain.mjs';
 import { openStore } from './store.mjs';
@@ -132,7 +133,8 @@ export function createApplication(config, { send = null, ownAddress = null } = {
     ttlHours: Number(demoConfig.saat ?? 72), max: Number(demoConfig.enFazla ?? 200), perIpHour: Number(demoConfig.saatlikIpSiniri ?? 10), passwordHash
   }) : null;
   // Vekil arkasında gerçek istemci adresi: Cloudflare → CF-Connecting-IP, Caddy → X-Forwarded-For.
-  const clientIp = req => proxy ? String(req.headers['cf-connecting-ip'] ?? req.headers['x-forwarded-for'] ?? '').split(',')[0].trim() || req.socket.remoteAddress : req.socket.remoteAddress;
+  // Vekil arkasında gerçek IP yalnız güvenilen vekilden okunur; istemcinin yazdığı başlık sınırları aşmaya yetmez (gercek-ip.mjs).
+  const clientIp = req => proxy ? gercekIp(req) : req.socket.remoteAddress;
   const loginAttempts = new Map();
   const accountAttempts = new Map();
   // Aynı hesaba 15 dakikada 5 hatalı denemeden sonra hesap geçici olarak kilitlenir (proxy arkasında da çalışır).
