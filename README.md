@@ -8,6 +8,9 @@ Bölümler arası işgücü desteğini kaydeden, karşı bölüme onaylatan ve p
 
 ![Genel bakış](docs/img/genel-bakis.webp)
 
+
+**Kurumda kullanacaksan:** Çalışanların kişisel verisi işlenir. KVKK notları, çalışan duyurusu ve (video projelerinde) çekim öncesi onay şablonu: [docs/KVKK_VE_CALISAN_BILGILENDIRME.md](docs/KVKK_VE_CALISAN_BILGILENDIRME.md).
+
 ## Neler yapar
 
 | Alan | İçerik |
