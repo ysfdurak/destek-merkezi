@@ -197,7 +197,16 @@ export function createApplication(config, { send = null } = {}) {
       const path = new URL(req.url,baseUrl).pathname;
       if (req.method === 'GET' && assets.has(path)) {
         const [file,type] = assets.get(path);
-        let body = readFileSync(resolve(ROOT,'public',file));
+        let body;
+        try { body = readFileSync(resolve(ROOT,'public',file)); }
+        catch (error) {
+          // Derlenmemiş kurulumda boş 500 yerine ne yapılacağını söyle.
+          if (error.code !== 'ENOENT') throw error;
+          console.error(`public/${file} bulunamadı. Önce "npm run build" çalıştırın.`);
+          res.writeHead(503, { 'Content-Type':'text/plain; charset=utf-8', 'Cache-Control':'no-store' });
+          res.end('Uygulama dosyaları derlenmemiş. Sunucu klasöründe "npm run build" çalıştırıp yeniden başlatın.');
+          return;
+        }
         // Herkese açık demoda (DEMO_MODE) giriş sayfasına arama ve paylaşım etiketleri eklenir. Kurum kurulumunda eklenmez.
         if (demo && file === 'index.html') body = body.toString('utf8').replace('<title>Destek Merkezi</title>', seoHead(baseUrl));
         res.writeHead(200, { 'Content-Type':type, 'Cache-Control':'no-cache' });
