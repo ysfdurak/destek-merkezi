@@ -2,5 +2,14 @@
 # Alan adını kendi adresinizle değiştirin; .env içindeki DESTEK_BASE_URL ile aynı olmalı.
 destek.sirketiniz.com.tr {
 	encode zstd gzip
+	# Güvenlik başlıkları (uygulama kendi CSP'sini gönderir; ? = uygulama göndermediyse ekle)
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		?Referrer-Policy "strict-origin-when-cross-origin"
+		?Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		?X-Frame-Options "DENY"
+		-Server
+	}
 	reverse_proxy destek:8080
 }
