@@ -2,6 +2,9 @@ name: Test ve derleme
 on:
   push:
   pull_request:
+# İş akışı yalnızca kodu okur; GITHUB_TOKEN'a yazma yetkisi verilmez.
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest

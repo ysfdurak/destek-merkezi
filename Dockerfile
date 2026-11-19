@@ -6,7 +6,9 @@
 # 1. aşama: tarayıcı arayüzünü derle
 FROM node:24-bookworm-slim AS build
 WORKDIR /app
+# vendor/: SheetJS 0.20.3 (npm'deki xlsx 0.18.5 artık güncellenmiyor, bkz. vendor/README.md)
 COPY package.json package-lock.json ./
+COPY vendor ./vendor
 RUN npm ci --no-audit --no-fund
 COPY app ./app
 COPY lib ./lib
