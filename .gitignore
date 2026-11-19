@@ -22,6 +22,8 @@
 *.pem
 *.key
 *.pfx
+# Yalnız test için kendinden imzalı sertifika (CN=127.0.0.1, parola: test-parola); gerçek kullanımda işe yaramaz.
+!tests/fixtures/test-sertifika.pfx
 *.p12
 *.crt
 *.cer
