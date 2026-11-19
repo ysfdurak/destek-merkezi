@@ -25,7 +25,9 @@ Sunucu Node.js 24 ile çalışır. Çalışanlar kurum içi adrese tarayıcıdan
 
 **Başka cihazdan giriş HTTPS ister.** Uygulama HTTPS olmadan ağa açılırsa yalnızca kurulu olduğu bilgisayardan giriş yapılır. Telefon veya ikinci bilgisayar giriş ekranında "bağlantı şifreli değil" uyarısını görür ve oturum açamaz. Bunun nedeni şu: HTTPS olmadan parola ve oturum bilgisi ağda açık gider, aynı ağdaki biri okuyabilir.
 
-**Küçük işletmede yerel ağa açma (HTTPS ile):** Uygulamanın çalıştığı bilgisayarın yerel IP adresini öğren (ör. 192.168.1.20). Sonra uygulama klasöründe PowerShell aç ve aşağıdaki komutlarla iki yıllık bir sertifika oluştur. İlk satırdaki IP adresini kendi adresinle değiştir:
+**Küçük işletmede yerel ağa açma (HTTPS ile), kolay yol:** Uygulama klasöründeki **AgaAc.cmd** dosyasına çift tıkla (güvenlik duvarı kuralı da eklensin istersen sağ tık › Yönetici olarak çalıştır). Betik bu bilgisayarın yerel ağ adresini bulur, iki yıllık bir sertifika üretir (veri\sertifika.pfx ve cihazlara yüklenecek veri\sertifika.cer), parolasını rastgele üretip **ayarlar.json**'a yazar, eski ayarları **ayarlar.json.yedek** olarak saklar, veri, yedek klasörleri ve ayar dosyası için okuma izinlerini daraltır ve portu yalnız yerel ağa açar. Sonra Baslat.cmd ile sunucuyu yeniden başlat. IP adresi değişirse betiği yeniden çalıştır.
+
+**Elle yapmak istersen:** Uygulamanın çalıştığı bilgisayarın yerel IP adresini öğren (ör. 192.168.1.20). Sonra uygulama klasöründe PowerShell aç ve aşağıdaki komutlarla iki yıllık bir sertifika oluştur. İlk satırdaki IP adresini kendi adresinle değiştir:
 
 ~~~powershell
 $ip = "192.168.1.20"
