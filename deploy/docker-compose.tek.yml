@@ -1,6 +1,8 @@
 # Tek başına sunucu: Destek Merkezi + Caddy (otomatik Let's Encrypt HTTPS).
 # Önce deploy/Caddyfile içindeki alan adını kendi adresinizle değiştirin.
 #   cd deploy && docker compose -f docker-compose.tek.yml up -d --build
+# Proje adı açık (aynı klasördeki başka compose dosyalarıyla karışmasın); birim adları eski kurulumla aynı.
+name: destek
 services:
   destek:
     build: ..
@@ -49,6 +51,9 @@ services:
         max-size: "10m"
         max-file: "3"
 volumes:
-  destek-data: {}
-  caddy-data: {}
-  caddy-config: {}
+  destek-data:
+    name: deploy_destek-data
+  caddy-data:
+    name: deploy_caddy-data
+  caddy-config:
+    name: deploy_caddy-config
