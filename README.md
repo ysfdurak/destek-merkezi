@@ -84,7 +84,7 @@ npm start            # http://127.0.0.1:8732
 npm run build && npm test
 ```
 
-52 test şunları kapsar:
+61 test şunları kapsar:
 
 - oturum ve bölüm yetkisi
 - destek, onay ve geri çekme akışı
@@ -94,6 +94,7 @@ npm run build && npm test
 - yedek, profil ve parola
 - e-posta kuyruğu
 - demo alanlarının birbirinden ayrılması ve sınırları
+- **uçtan uca kabul** (`tests/kabul.test.mjs`): tek kayıt gece yarısını geçen C vardiyasında girilir, reddedilir, düzeltilip yeniden gönderilir, puantajla çelişir (sistem onayı bekletilir), puantaj düzeltilir ve onaylanır. Her adımda dönem özeti, birim raporu, uyumsuz destek raporu, personel raporu ve kayıt listesi aynı kayıt, kişi ve gün sayısını vermelidir
 
 GitHub Actions her gönderimde testleri çalıştırır, Docker imajını derler ve konteyneri demo modunda dener.
 
