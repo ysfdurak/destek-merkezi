@@ -410,3 +410,7 @@ Tarayıcıdaki kısıtlar atlatılabilir. Tarayıcı aynı `domain.mjs` dosyası
 
 **Testleri nasıl çalıştırırım?**
 `npm test`. Her iş kuralı için en az bir test vardır; bir kuralı değiştirince önce ilgili testi güncelle.
+
+## Onay kartında bekleme, sorumlu ve saate etkisi (19 Kasım 2026)
+- **Ne var?** Onay kutusundaki her kartta üç kutu: **Ne zamandır bekliyor** (`submittedAt`'ten bu yana saat/gün ve gönderilme zamanı), **Kimden işlem bekleniyor** (destek alan bölüm; kart yalnız karar verebilen kullanıcıya göründüğü için "senden"), **Toplam saate etkisi** (`netHours(r) × kişi sayısı`; uyumsuzluk varsa `excludeIssues` ayarına göre "sayılmaz" ya da "uyumsuzluğa rağmen sayılır", planlanan kayıtta "gerçekleşince sayılır").
+- **Kod:** `app/ui.tsx` onay kartı (`approval-facts`), stil `app/globals.css`. Hesap kuralı `lib/domain.mjs` → `counted` ile aynıdır; kural değişirse karttaki metin de değişmeli. İngilizce karşılıklar `lib/i18n/en.json`.
