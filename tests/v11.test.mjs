@@ -165,7 +165,7 @@ test('yedek saatinden önce alınmaz; sonra bir kez alınır ve en fazla keep ka
   rmSync(dir, { recursive: true, force: true });
 });
 
-test('profil: küçük işletme yerel ağda HTTP ile açılabilir, orta profil HTTPS ister', () => {
+test('profil: küçük işletme yerel ağda HTTP ile başlar (başka cihaz girişi https.test.mjs), orta profil HTTPS ister', () => {
   const dir = mkdtempSync(join(tmpdir(), 'destek-profil-'));
   assert.throws(() => createApplication({ profil: 'orta', host: '0.0.0.0', baseUrl: 'http://192.168.1.20:8732', database: join(dir, 'a.sqlite'), yedek: { acik: false } }), /TLS/);
   const app = createApplication({ profil: 'kucuk', host: '0.0.0.0', baseUrl: 'http://192.168.1.20:8732', database: join(dir, 'b.sqlite'), yedek: { acik: false } });

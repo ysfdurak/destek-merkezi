@@ -31,7 +31,7 @@
 
 ## Açık kararlar ve doğrulama
 
-- Küçük işletme profilinde yerel ağ erişimi HTTPS olmadan açılabilir; bu bilinçli bir kolaylık-güvenlik tercihidir ve kurulum dosyasında uyarılır.
+- Başka cihazdan giriş her profilde HTTPS ister (Kasım 2026, V1.6). Küçük işletme profilinde HTTPS'siz kurulum yalnız uygulamanın çalıştığı bilgisayarda giriş verir; aynı bilgisayarda deneme kolaylığı korunur. Önceki "yerel ağda HTTPS'siz açılabilir" tercihi kaldırıldı: parola ve oturum çerezi ağda açık gidiyordu (OWASP: oturum boyunca taşıma şifrelemesi).
 
 - Başlangıç notunda personel atanmadan kişi adediyle talep açma ve kişi bazında farklı gerçekleşen saatler vardı. V1’de personel seçimi zorunlu ve seçilen kişilere tek ortak zaman aralığı uygulanır.
 - Puantaj kontrolü başlangıç tarihindeki satırı kullanır. Birden fazla vardiya satırı, vardiya takvimi, geçmiş bölüm atamaları ve ayrı mola kayıtlarının eşleştirme kuralları sonraki kapsam kararlarıdır.

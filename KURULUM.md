@@ -19,17 +19,32 @@ Sunucu Node.js 24 ile çalışır. Çalışanlar kurum içi adrese tarayıcıdan
 
 | Profil | Kimin için | Ağa açma | Saklanan yedek |
 |---|---|---|---|
-| kucuk | 1–10 kullanıcı, tek lokasyon | Yerel ağda HTTPS olmadan açılabilir | 14 gün |
+| kucuk | 1–10 kullanıcı, tek lokasyon | Aynı bilgisayarda HTTPS'siz; başka cihazdan giriş için HTTPS | 14 gün |
 | orta | Birkaç lokasyon, ofis sunucusu | HTTPS zorunlu | 30 gün |
 | kurumsal | BT ekibi ve Microsoft 365 olan kurum | HTTPS zorunlu | 90 gün |
 
-**Küçük işletmede yerel ağa açma:** Uygulamanın çalıştığı bilgisayarın yerel IP adresini öğren (ör. 192.168.1.20). Ayarları şöyle yap ve sunucuyu yeniden başlat:
+**Başka cihazdan giriş HTTPS ister.** Uygulama HTTPS olmadan ağa açılırsa yalnızca kurulu olduğu bilgisayardan giriş yapılır. Telefon veya ikinci bilgisayar giriş ekranında "bağlantı şifreli değil" uyarısını görür ve oturum açamaz. Bunun nedeni şu: HTTPS olmadan parola ve oturum bilgisi ağda açık gider, aynı ağdaki biri okuyabilir.
 
-~~~json
-{ "profil": "kucuk", "host": "0.0.0.0", "port": 8732, "baseUrl": "http://192.168.1.20:8732" }
+**Küçük işletmede yerel ağa açma (HTTPS ile):** Uygulamanın çalıştığı bilgisayarın yerel IP adresini öğren (ör. 192.168.1.20). Sonra uygulama klasöründe PowerShell aç ve aşağıdaki komutlarla iki yıllık bir sertifika oluştur. İlk satırdaki IP adresini kendi adresinle değiştir:
+
+~~~powershell
+$ip = "192.168.1.20"
+$cert = New-SelfSignedCertificate -Subject "CN=$ip" -TextExtension @("2.5.29.17={text}IPAddress=$ip") -CertStoreLocation Cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(2) -KeyExportPolicy Exportable
+$parola = Read-Host "Sertifika parolası" -AsSecureString
+Export-PfxCertificate -Cert $cert -FilePath .\veri\sertifika.pfx -Password $parola -CryptoAlgorithmOption AES256_SHA256
+Export-Certificate -Cert $cert -FilePath .\veri\sertifika.cer
 ~~~
 
-Diğer bilgisayarlar tarayıcıdan **http://192.168.1.20:8732** adresine girer. Bu modda parolalar ağda şifresiz gider. Yalnızca güvendiğin küçük ağda kullan; Windows Güvenlik Duvarı 8732 portuna izin istemiş olabilir.
+**ayarlar.json** içine şunu yaz ve sunucuyu yeniden başlat (parola, yukarıda girdiğin sertifika parolasıdır):
+
+~~~json
+{ "profil": "kucuk", "host": "0.0.0.0", "port": 8732, "baseUrl": "https://192.168.1.20:8732",
+  "tls": { "pfx": "veri/sertifika.pfx", "parola": "SERTIFIKA-PAROLASI" } }
+~~~
+
+Diğer cihazlar **https://192.168.1.20:8732** adresine girer. Sertifikayı bu bilgisayar kendisi imzaladığı için tarayıcı ilk girişte "bağlantı gizli değil" uyarısı verir. Uyarıyı kaldırmak için **veri/sertifika.cer** dosyasını her cihaza "Güvenilen kök sertifika yetkilileri" olarak yükle. Bu, bağlantının bu bilgisayara gittiğini doğrular. Yüklemeden devam edilirse bağlantı yine şifreli olur ama aradaki birinin araya girmesine karşı koruma zayıflar. Kurumda BT ekibi varsa kurumun kendi sertifikasını kullanmak daha iyidir (aşağıda). **ayarlar.json** artık sertifika parolasını içerdiği için klasörü yalnız yöneticiler görebilmeli. Windows Güvenlik Duvarı 8732 portuna izin isteyebilir.
+
+PEM biçiminde anahtar ve sertifikan varsa **tls** alanında **pfx** yerine **key** ve **cert** yollarını yazabilirsin.
 
 ## Otomatik yedek
 

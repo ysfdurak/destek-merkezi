@@ -1,5 +1,13 @@
 # Destek Merkezi · Değişiklikler ve kod rehberi
 
+## Başka cihazdan giriş HTTPS ister · 19 Kasım 2026 (1.6.0)
+
+- **Önceki durum:** Küçük işletme profili yerel ağa HTTP ile açılabiliyordu. Telefondan veya ikinci bilgisayardan girişte parola ve oturum çerezi ağda şifresiz gidiyordu.
+- **Şimdi:** HTTPS'siz kurulumda yalnız uygulamanın kurulu olduğu bilgisayardan giriş yapılır. Başka bir cihaz giriş ekranında "bağlantı şifreli değil, https:// adresini iste" uyarısını görür; giriş ve bütün API istekleri `HTTPS_REQUIRED` iletisiyle reddedilir. Daha önce alınmış bir oturum çerezi de HTTP üzerinden işe yaramaz.
+- **HTTPS kolaylaştı:** `tls.pfx` + `tls.parola` ile Windows'ta PowerShell'le üretilen tek sertifika dosyası kullanılabilir (KURULUM.md). PEM (`tls.key` + `tls.cert`) desteği sürer.
+- **Kodda:** `server/main.mjs` › `plainRemote(req)`: ağ kurulumu HTTPS'siz ve istek bu bilgisayarın kendi adreslerinden (`os.networkInterfaces`) gelmiyorsa doğru. `/api/startup` bu durumda `httpsRequired: true` döner; `app/local-access.tsx` uyarıyı gösterir ve formu gizler.
+- **Kabul testi** (`tests/https.test.mjs`): HTTPS'siz kurulumda aynı bilgisayar kurulum, giriş ve işlem yapar; başka cihaz oturum açamaz ve ele geçen çerezle de erişemez. HTTPS (.pfx) ile başka cihazdaki yetkili kullanıcı giriş yapıp kayıtları okur.
+
 ## İngilizce arayüz · 15 Kasım 2026 (1.5.0)
 
 - **Ne:** `?lang=en` ya da kenar çubuğundaki **English** düğmesiyle tüm arayüz, raporlar, Excel çıktıları ve sunucu hata iletileri İngilizce; İngilizce sayfadan açılan demo alanı İngilizce örnek verilerle gelir.
@@ -378,7 +386,7 @@ Dönem kapalıysa yalnızca yönetici geri çekebilir. Yeniden gönderilen kayı
 ## Sunucu
 
 - **Kurulum profili:** `ayarlar.json` içindeki `"profil"` alanı:
-  - `kucuk`: 1–10 kullanıcı. Yerel ağda HTTPS olmadan açılabilir (konsolda uyarı çıkar), 14 yedek saklanır.
+  - `kucuk`: 1–10 kullanıcı. HTTPS olmadan ağa açılabilir ama o durumda yalnız uygulamanın kurulu olduğu bilgisayardan giriş yapılır; başka cihazdan gelen API istekleri `HTTPS_REQUIRED` iletisiyle reddedilir (`plainRemote`, bu bilgisayarın kendi adresleri `os.networkInterfaces` ile tanınır). Başka cihaz için HTTPS: `tls.pfx` (Windows'ta dışa aktarılan sertifika) ya da `tls.key` + `tls.cert`. 14 yedek saklanır. Test: `tests/https.test.mjs`.
   - `orta`: Ağa açarken HTTPS zorunlu, 30 yedek.
   - `kurumsal`: HTTPS ve Microsoft 365, 90 yedek.
 - **Otomatik yedek:** Her gün saat 02.00'den sonra `yedek/destek-YYYY-AA-GG.sqlite` oluşur. Sunucu çalışırken alınır. Geri dönmek için sunucuyu durdur, yedeği `veri/destek.sqlite` adıyla kopyala, sunucuyu başlat.

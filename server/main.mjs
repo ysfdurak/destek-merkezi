@@ -5,6 +5,7 @@ import { createServer as httpsServer } from 'node:https';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { createHash, randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
+import { networkInterfaces } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { applyAction, record, sampleHistory, scoped, seed } from '../lib/domain.mjs';
 import { openStore } from './store.mjs';
@@ -15,6 +16,7 @@ import { langOf, tx } from './i18n.mjs';
 
 // Kurulum profilleri: işletme büyüklüğüne göre hazır ayarlar. ayarlar.json içindeki 'profil' alanıyla seçilir.
 export const PROFILES = {
+  // kucuk: ağa HTTPS'siz açılabilir ama o durumda başka cihazdan giriş reddedilir (yalnız aynı bilgisayar çalışır).
   kucuk:    { lanHttp: true,  backupKeep: 14 },  // 1–10 kullanıcı, tek bilgisayar veya küçük yerel ağ
   orta:     { lanHttp: false, backupKeep: 30 },  // ağa açılırken HTTPS zorunlu
   kurumsal: { lanHttp: false, backupKeep: 90 }   // HTTPS, Microsoft 365, uzun yedek saklama
@@ -79,16 +81,30 @@ export function seoHead(baseUrl) {
   ].join('\n');
 }
 
-export function createApplication(config, { send = null } = {}) {
+// Başka cihazdan HTTPS'siz girişte dönen ileti. Parola ve oturum çerezi ağda şifresiz gideceği için reddedilir.
+export const HTTPS_REQUIRED = 'Başka bir cihazdan giriş yalnızca HTTPS ile yapılır. Bu bağlantıda parolan ağda şifresiz giderdi. Yöneticiden https:// ile başlayan adresi iste.';
+const LOOPBACK = ['127.0.0.1','::1','::ffff:127.0.0.1'];
+/** Bu bilgisayarın kendi adresleri: uygulama yerel ağ IP'siyle açılsa da aynı bilgisayardan gelen istek yerel sayılır. */
+function ownAddresses() {
+  const out = new Set(LOOPBACK);
+  for (const list of Object.values(networkInterfaces())) for (const i of list ?? []) { out.add(i.address); out.add('::ffff:'+i.address); }
+  return out;
+}
+
+export function createApplication(config, { send = null, ownAddress = null } = {}) {
   const host = config.host ?? '127.0.0.1';
   const port = config.port ?? 8732;
-  const secure = Boolean(config.tls?.key && config.tls?.cert);
+  // HTTPS: PEM anahtar + sertifika ya da Windows'ta dışa aktarılan tek .pfx dosyası (KURULUM.md).
+  const secure = Boolean((config.tls?.key && config.tls?.cert) || config.tls?.pfx);
   // proxy: uygulama Caddy gibi bir ters vekilin arkasında, düz HTTP ile çalışır; HTTPS'i vekil sağlar.
   const proxy = config.proxy === true && !secure;
   const profileName = config.profil ?? 'kucuk';
   const profile = PROFILES[profileName];
   if (!profile) throw new Error('profil ayarı kucuk, orta veya kurumsal olmalı.');
   const lanHttp = !secure && !proxy && host !== '127.0.0.1';
+  const isOwn = ownAddress ?? (address => ownAddresses().has(address));
+  // HTTPS'siz ağ kurulumunda başka cihazdan gelen istek: arayüz açılır, giriş ve API reddedilir.
+  const plainRemote = req => lanHttp && !isOwn(req.socket.remoteAddress);
   if (lanHttp && !profile.lanHttp) throw new Error('Orta ve kurumsal profilde ağa açmak için TLS sertifikası ve anahtarı gerekir.');
   const baseUrl = new URL(config.baseUrl ?? `${secure?'https':'http'}://127.0.0.1:${port}`);
   if (baseUrl.protocol !== (secure||proxy?'https:':'http:') || baseUrl.pathname !== '/' ||
@@ -214,7 +230,9 @@ export function createApplication(config, { send = null } = {}) {
         return;
       }
       if (req.method === 'POST' && req.headers.origin !== baseUrl.origin) throw new RequestError(403,'Geçersiz istek kaynağı.');
+      if (path.startsWith('/api/') && path !== '/api/startup' && plainRemote(req)) throw new RequestError(403,HTTPS_REQUIRED);
       if (req.method === 'GET' && path === '/api/startup') {
+        if (plainRemote(req)) return json(res,200,{setup:false, local:false, httpsRequired:true});
         if (demo) return json(res,200,{setup:false, local:false, demo:true, hasDemo:Boolean(store), ttlHours:demo.ttlHours});
         return json(res,200,{setup:!store.read(), local:!proxy && ['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)});
       }
@@ -354,7 +372,10 @@ export function createApplication(config, { send = null } = {}) {
     }
   }
   const server=secure ? httpsServer({
-    key:readFileSync(resolve(ROOT,config.tls.key)), cert:readFileSync(resolve(ROOT,config.tls.cert)), minVersion:'TLSv1.2'
+    ...(config.tls.pfx
+      ? { pfx:readFileSync(resolve(ROOT,config.tls.pfx)), passphrase:config.tls.parola ?? '' }
+      : { key:readFileSync(resolve(ROOT,config.tls.key)), cert:readFileSync(resolve(ROOT,config.tls.cert)) }),
+    minVersion:'TLSv1.2'
   },handler) : httpServer(handler);
   return {server,store:mainStore,demo,tick,backup,host,port,baseUrl,lanHttp,proxy};
 }
@@ -386,7 +407,7 @@ if (process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)
     });
     app.server.listen(app.port,app.host,()=>{
       console.log(`Destek Merkezi hazır: ${app.baseUrl.origin}\nArka plan kontrolleri bu pencere açık kaldığı sürece çalışır.`);
-      if (app.lanHttp) console.warn('UYARI: Uygulama yerel ağa HTTPS olmadan açık. Parolalar ağda şifresiz gider; yalnızca güvendiğiniz küçük ağda kullanın.');
+      if (app.lanHttp) console.warn('UYARI: Uygulama yerel ağa HTTPS olmadan açık. Yalnız bu bilgisayardan giriş yapılabilir; başka cihazlar HTTPS gerektiği iletisini görür. HTTPS kurulumu: KURULUM.md › Yerel ağa açma.');
       if (process.platform==='win32' && process.argv.includes('--open')) {
         execFile('rundll32.exe',['url.dll,FileProtocolHandler',app.baseUrl.origin],error=>{
           if (error) console.error('Tarayıcı açılamadı. Yukarıdaki adresi tarayıcıya yazın.');

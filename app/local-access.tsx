@@ -3,7 +3,7 @@ import { ArrowLeftRight, LockKeyhole, PlayCircle, RotateCcw } from 'lucide-react
 import LangSwitch from './lang-switch';
 
 export default function LocalAccess({ onReady }: { onReady: () => void }) {
-  const [startup,setStartup] = useState<{setup:boolean;local:boolean;demo?:boolean;hasDemo?:boolean;ttlHours?:number}|null>(null);
+  const [startup,setStartup] = useState<{setup:boolean;local:boolean;httpsRequired?:boolean;demo?:boolean;hasDemo?:boolean;ttlHours?:number}|null>(null);
   const [error,setError] = useState('');
   const [busy,setBusy] = useState(false);
   const [demo,setDemo] = useState(true);
@@ -76,7 +76,8 @@ export default function LocalAccess({ onReady }: { onReady: () => void }) {
       <h1>{setup ? 'Destek Merkezi’ni kur' : 'Destek Merkezi'}</h1>
       <p>{setup ? 'Bir yönetici hesabı oluştur ve çalışma alanını seç.' : 'Kurum içi çalışma alanına giriş yap.'}</p>
       {error && <div className="alert danger" role="alert">{error}</div>}
-      {startup && (setup && !startup.local ? <div className="alert"><LockKeyhole size={18}/>İlk kurulumu uygulamanın çalıştığı makinede yapın.</div> : <form onSubmit={submit}>
+      {startup?.httpsRequired && <div className="alert" role="alert"><LockKeyhole size={18}/><span>Bu adresten giriş kapalı: bağlantı şifreli değil (HTTPS yok) ve parolan ağda açık giderdi. Yöneticiden https:// ile başlayan adresi iste. Uygulamanın kurulu olduğu bilgisayarda giriş çalışmaya devam eder.</span></div>}
+      {startup && !startup.httpsRequired && (setup && !startup.local ? <div className="alert"><LockKeyhole size={18}/>İlk kurulumu uygulamanın çalıştığı makinede yapın.</div> : <form onSubmit={submit}>
         {setup && <label>Ad soyad<input name="name" autoComplete="name" maxLength={120} required/></label>}
         <label>E-posta<input name="email" type="email" autoComplete="username" maxLength={254} required/></label>
         <label>Parola<input name="password" type="password" autoComplete={setup?'new-password':'current-password'} minLength={12} maxLength={200} required/></label>
