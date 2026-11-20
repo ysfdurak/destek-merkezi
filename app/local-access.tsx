@@ -83,8 +83,8 @@ export default function LocalAccess({ onReady }: { onReady: () => void }) {
         <label>Parola<input name="password" type="password" autoComplete={setup?'new-password':'current-password'} minLength={12} maxLength={200} required/></label>
         {setup && <fieldset className="setup-mode">
           <legend>Çalışma alanı</legend>
-          <label><input type="radio" checked={demo} onChange={()=>setDemo(true)} /> Örnek verilerle dene</label>
-          <label><input type="radio" checked={!demo} onChange={()=>setDemo(false)} /> Boş çalışma alanı oluştur</label>
+          <label><input type="radio" name="calisma-alani" value="ornek" checked={demo} onChange={()=>setDemo(true)} /> Örnek verilerle dene</label>
+          <label><input type="radio" name="calisma-alani" value="bos" checked={!demo} onChange={()=>setDemo(false)} /> Boş çalışma alanı oluştur</label>
         </fieldset>}
         <button type="submit" className="button primary" disabled={busy}>{busy?'Bekleyin…':setup?'Çalışma alanını oluştur':'Giriş yap'}</button>
       </form>)}

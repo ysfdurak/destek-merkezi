@@ -3,6 +3,12 @@ $directory = $PSScriptRoot
 $database = Join-Path $directory 'Destek_Merkezi.accdb'
 $temporary = Join-Path $directory ('Destek_Kurulum_' + [Guid]::NewGuid().ToString('N') + '.accdb')
 $access = $null
+$stage = 'access'
+
+function Release-Com {
+    param($object)
+    if ($null -ne $object) { try { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($object) } catch {} }
+}
 
 function Add-Control {
     param([string]$Name,[int]$Type,[int[]]$Box,[string]$Group,[string]$Caption,[hashtable]$Options = @{})
@@ -16,11 +22,13 @@ function Add-Control {
         $control.FontSize = 10
     }
     foreach ($property in $Options.Keys) { $control.$property = $Options[$property] }
+    Release-Com $control
 }
 
 try {
     if (Test-Path -LiteralPath $database) { Start-Process -FilePath $database; exit 0 }
     $access = New-Object -ComObject Access.Application
+    $stage = 'form'
     $access.NewCurrentDatabase($temporary, 12)
     $form = $access.CreateForm()
     $tempName = $form.Name
@@ -97,20 +105,32 @@ try {
     $db = $access.CurrentDb()
     try { $db.Properties('StartupForm').Value = 'frmDestekMerkezi' }
     catch { $db.Properties.Append($db.CreateProperty('StartupForm', 10, 'frmDestekMerkezi')) }
-    $db = $null
-    $module = $null
-    $form = $null
+    # COM nesneleri bırakılmazsa Access kapandıktan sonra da .accdb kilitli kalır.
+    Release-Com $db; $db = $null
+    Release-Com $module; $module = $null
+    Release-Com $form; $form = $null
     $access.CloseCurrentDatabase()
     $access.Quit(2)
-    $access = $null
-    Move-Item -LiteralPath $temporary -Destination $database
+    Release-Com $access; $access = $null
+    [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
+    $stage = 'move'
+    # Access süreci dosyayı birkaç saniye daha tutabilir; 15 saniye boyunca yeniden denenir.
+    for ($attempt = 1; $attempt -le 30; $attempt++) {
+        try { Move-Item -LiteralPath $temporary -Destination $database -ErrorAction Stop; break }
+        catch { if ($attempt -eq 30) { throw } ; Start-Sleep -Milliseconds 500 }
+    }
     Write-Host "Oluşturuldu: $database"
     Start-Process -FilePath $database
 } catch {
-    Write-Host "Access dosyası oluşturulamadı. Tam Microsoft Access masaüstü sürümü ve BT onaylı VBA çalıştırma izni gerekir."
-    Write-Host $_.Exception.Message
+    switch ($stage) {
+        'access' { Write-Host "Microsoft Access başlatılamadı. Tam Access masaüstü sürümü gerekir (Access Runtime form oluşturamaz)." }
+        'form'   { Write-Host "Access form oluşturulurken durdu. VBA projesine erişim veya kod çalıştırma izni kapalı olabilir; BT onaylı ayarları kontrol edin." }
+        'move'   { Write-Host "Form oluşturuldu ama dosya hâlâ kilitli: Access kapanmayı bitirmedi. Birkaç saniye bekleyip Baslat_Access.cmd dosyasını yeniden açın; açık Access penceresi varsa kapatın." }
+    }
+    Write-Host ("Ayrıntı: " + $_.Exception.Message)
     exit 1
 } finally {
-    if ($null -ne $access) { try { $access.Quit(2) } catch {} }
+    if ($null -ne $access) { try { $access.Quit(2) } catch {}; Release-Com $access; $access = $null }
+    [GC]::Collect(); [GC]::WaitForPendingFinalizers()
     if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -ErrorAction SilentlyContinue }
 }

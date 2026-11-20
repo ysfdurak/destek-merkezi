@@ -534,7 +534,7 @@
  "ONAY BEKLEYEN": "AWAITING APPROVAL",
  "OPERASYON /": "OPERATIONS /",
  "Oca": "Jan",
- "Okan · Stok": "Okan · Stock",
+ "Okan · Stok Kontrol": "Okan · Stock Control",
  "Oluşturma:": "Created:",
  "Onay bekleyen": "Awaiting approval",
  "Onay bekliyor": "Awaiting approval",
@@ -1037,5 +1037,6 @@
  " sa · ": " h · ",
  " kişi": " people",
  "Bu adresten giriş kapalı: bağlantı şifreli değil (HTTPS yok) ve parolan ağda açık giderdi. Yöneticiden https:// ile başlayan adresi iste. Uygulamanın kurulu olduğu bilgisayarda giriş çalışmaya devam eder.": "Sign-in is closed at this address: the connection is not encrypted (no HTTPS) and your password would travel across the network in plain text. Ask your administrator for the address that starts with https://. Sign-in keeps working on the computer where the app is installed.",
- "Başka bir cihazdan giriş yalnızca HTTPS ile yapılır. Bu bağlantıda parolan ağda şifresiz giderdi. Yöneticiden https:// ile başlayan adresi iste.": "Signing in from another device requires HTTPS. On this connection your password would travel across the network in plain text. Ask your administrator for the address that starts with https://."
+ "Başka bir cihazdan giriş yalnızca HTTPS ile yapılır. Bu bağlantıda parolan ağda şifresiz giderdi. Yöneticiden https:// ile başlayan adresi iste.": "Signing in from another device requires HTTPS. On this connection your password would travel across the network in plain text. Ask your administrator for the address that starts with https://.",
+ "Destek Merkezi: genel bakışa dön": "Destek Merkezi: back to overview"
 }
