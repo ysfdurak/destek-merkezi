@@ -4,8 +4,8 @@
 
 ## İlk açılış
 
-1. Kaynak paketi yazılabilir bir klasöre ayıkla. Node.js 24 ile proje klasöründe **npm ci** ve **npm run build** çalıştır.
-2. Windows’ta **Baslat.cmd** dosyasını aç. Komut satırından başlatmak için **ayarlar.ornek.json** dosyasını **ayarlar.json** olarak kopyala ve **npm start** çalıştır. Tarayıcı otomatik açılmazsa **http://127.0.0.1:8732** adresine git.
+1. Kaynak paketi yazılabilir bir klasöre ayıkla ve Node.js 24 kur.
+2. Windows’ta **Baslat.cmd** dosyasını aç. İlk açılışta **npm ci** ve **npm run build** kendiliğinden çalışır (internet gerekir, bir kez yapılır). PowerShell'den açıyorsan `.\Baslat.cmd` yaz. Komut satırından başlatmak için **ayarlar.ornek.json** dosyasını **ayarlar.json** olarak kopyala ve **npm start** çalıştır. Tarayıcı otomatik açılmazsa **http://127.0.0.1:8732** adresine git.
 3. Yönetici hesabı için ad, e-posta adresi ve en az 12 karakterli parola belirle. Örnek verilerle denemeyi veya boş çalışma alanı oluşturmayı seç.
 4. Örnek alanda üstteki kullanıcı seçimiyle onay ve ret akışını dene. Boş alanda **Tanımlar ve kullanıcılar** ekranından lokasyon, en az iki bölüm, personel ve bölüm yetkilisi hesaplarını oluştur.
 

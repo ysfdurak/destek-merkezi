@@ -9,5 +9,5 @@ if exist "Destek_Merkezi.accdb" (
     start "" "%~dp0Destek_Merkezi.accdb"
     exit /b 0
 )
-powershell.exe -NoProfile -File "%~dp0Access_Olustur.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Access_Olustur.ps1"
 if errorlevel 1 pause
