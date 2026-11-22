@@ -56,6 +56,16 @@ Adam-saat ve verimlilik hesabı bilinçli olarak yok. Program yalnızca kayıt v
 
 ## Çalıştırma
 
+### Hazır paket (Windows, Node.js kurmadan)
+
+1. [Sürümler (Releases)](https://github.com/ysfdurak/destek-merkezi/releases/latest) sayfasından `destek-merkezi-<sürüm>-windows-x64.zip` dosyasını indir. İstersen yanındaki `.sha256` dosyasıyla doğrula (PowerShell: `Get-FileHash .\destek-merkezi-*.zip`).
+2. Zip'e sağ tıkla › **Özellikler** › **Engellemeyi kaldır** (varsa), sonra yazılabilir bir klasöre ayıkla (ör. `C:\DestekMerkezi` ya da Belgeler). `C:\Program Files` gibi yazma izni olmayan klasörlere koyma: veri ve yedek paket klasöründe oluşur.
+3. **Baslat.cmd** dosyasına çift tıkla. Tarayıcı **http://127.0.0.1:8732** adresinde açılır. İnternet ve kurulum gerekmez.
+
+Pakette Node.js'in resmî taşınabilir sürümü (`runtime\node\node.exe`) ve derlenmiş arayüz hazır gelir. Access istemcisi (`access\`), yerel ağa açma (`AgaAc.cmd`) ve profiller kaynak koddaki gibi çalışır. Yeni sürüme geçerken yeni zip'i ayrı klasöre aç, eski klasördeki **veri**, **yedek** ve **ayarlar.json**'u (varsa `access\Sunucu_Adresi.txt` ve `access\Destek_Merkezi.accdb`'yi de) yeni klasöre kopyala.
+
+### Kaynak koddan
+
 **Bilgisayarında denemek için:**
 
 ```bash
@@ -96,7 +106,7 @@ npm run build && npm test
 - demo alanlarının birbirinden ayrılması ve sınırları
 - **uçtan uca kabul** (`tests/kabul.test.mjs`): tek kayıt gece yarısını geçen C vardiyasında girilir, reddedilir, düzeltilip yeniden gönderilir, puantajla çelişir (sistem onayı bekletilir), puantaj düzeltilir ve onaylanır. Her adımda dönem özeti, birim raporu, uyumsuz destek raporu, personel raporu ve kayıt listesi aynı kayıt, kişi ve gün sayısını vermelidir
 
-GitHub Actions her gönderimde testleri çalıştırır, Docker imajını derler ve konteyneri demo modunda dener.
+GitHub Actions her gönderimde testleri çalıştırır, Docker imajını derler ve konteyneri demo modunda dener. Ayrıca gerçek bir Windows makinesinde hazır paketi üretir, açar ve sistemde Node.js yokken `Baslat.cmd` ile sunucunun HTTP 200 verdiğini denetler.
 
 ## English
 
@@ -105,7 +115,8 @@ GitHub Actions her gönderimde testleri çalıştırır, Docker imajını derler
 - **Try it:** https://destek.ysfdurak.com/?lang=en — no sign-in; you get your own workspace with a fictional warehouse organisation in English, deleted 3 days after last use. The whole interface, reports and demo data are in English (sidebar button to switch back).
 - **Features:** shift-based fixed durations, bulk and retroactive entry, same-day duplicate block, approval/rejection/withdrawal, mismatches with attendance, a hierarchy defined by the business (up to 6 levels), dashboard, six reports to Excel/PDF, attendance import from Excel, role-based access.
 - **Stack:** Node.js 24 with built-in modules only (`node:sqlite`, `node:http`), SQLite, React + TypeScript bundled with esbuild, optional Microsoft Access client. Business rules live in one core (`lib/domain.mjs`).
-- **Run locally:** `npm ci && npm run build && cp ayarlar.ornek.json ayarlar.json && npm start` → http://127.0.0.1:8732. Server set-up: [KURULUM.md](KURULUM.md) (Windows) and [docs/SUNUCU_KURULUMU.md](docs/SUNUCU_KURULUMU.md) (Docker / VPS).
+- **Ready-made Windows package (no Node.js install):** download `destek-merkezi-<version>-windows-x64.zip` from [Releases](https://github.com/ysfdurak/destek-merkezi/releases/latest), unblock it (right-click › Properties), extract it to a writable folder and double-click **Baslat.cmd** → http://127.0.0.1:8732. It bundles the official portable Node.js (`runtime\node\node.exe`) and the built interface; the Access client and `AgaAc.cmd` work as in the source tree. To upgrade, extract the new zip to a new folder and copy `veri`, `yedek` and `ayarlar.json` across.
+- **Run from source:** `npm ci && npm run build && cp ayarlar.ornek.json ayarlar.json && npm start` → http://127.0.0.1:8732. Server set-up: [KURULUM.md](KURULUM.md) (Windows) and [docs/SUNUCU_KURULUMU.md](docs/SUNUCU_KURULUMU.md) (Docker / VPS).
 - **Tests:** `npm run build && npm test` (52 tests).
 
 ## Bilinen konular

@@ -1,0 +1,135 @@
+# Node.js kurulumu gerektirmeyen Windows paketini üretir ve gerçek bir Windows makinesinde dener:
+# zip açılır, sistemdeki Node.js görünmezken Baslat.cmd çalıştırılır, sunucunun HTTP 200 verdiği denetlenir.
+# Paket her çalıştırmada Actions sayfasının "Artifacts" bölümünden indirilebilir.
+# v* etiketi gönderildiğinde ya da GitHub'da sürüm yayımlandığında zip ve .sha256 Sürümler sayfasına eklenir.
+name: Windows hazır paket
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Varsayılan olarak yalnız okuma; yazma yetkisi yalnız release işinde verilir.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paket:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Arayüzü derle
+        run: npm run build
+      - name: Paketi üret (Node.js SHA-256 doğrulamalı)
+        shell: pwsh
+        run: pwsh -NoProfile -File paket/paketle.ps1
+      - name: Paketi aç ve Baslat.cmd ile dene (sistem Node.js'i olmadan)
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem dist\*.zip | Select-Object -First 1
+          $beklenen = (Get-Content "$($zip.FullName).sha256").Split(' ')[0]
+          if ((Get-FileHash $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $beklenen) { throw "Zip .sha256 dosyasıyla tutmuyor" }
+          # Kullanıcı klasörü gibi boşluklu bir yola açılır.
+          $yer = Join-Path $env:RUNNER_TEMP "Paket Denemesi"
+          Expand-Archive -Path $zip.FullName -DestinationPath $yer
+          $kok = (Get-ChildItem $yer -Directory | Select-Object -First 1).FullName
+          Write-Host "Açılan klasör: $kok"
+          foreach ($d in "runtime\node\node.exe", "public\app.js", "public\index.html", "server\main.mjs", "access\Baslat_Access.cmd", "SURUM.txt") {
+            if (-not (Test-Path (Join-Path $kok $d))) { throw "Pakette eksik: $d" }
+          }
+          if (Test-Path (Join-Path $kok "node_modules")) { throw "Pakete node_modules girmemeli" }
+          if (Test-Path (Join-Path $kok "ayarlar.json")) { throw "Pakete ayarlar.json girmemeli" }
+          # Sistemdeki Node.js görünmesin: yalnız Windows klasörleri PATH'te kalır.
+          $env:Path = "$env:SystemRoot\System32;$env:SystemRoot;$env:SystemRoot\System32\WindowsPowerShell\v1.0"
+          if (Get-Command node -ErrorAction SilentlyContinue) { throw "PATH'te hâlâ node var" }
+          $p = Start-Process -FilePath (Join-Path $kok "Baslat.cmd") -WorkingDirectory $kok -PassThru `
+            -RedirectStandardOutput "$env:RUNNER_TEMP\sunucu.out.txt" -RedirectStandardError "$env:RUNNER_TEMP\sunucu.err.txt"
+          $tamam = $false
+          for ($i = 0; $i -lt 60; $i++) {
+            try {
+              $r = Invoke-WebRequest -Uri "http://127.0.0.1:8732/healthz" -UseBasicParsing -TimeoutSec 2
+              if ($r.StatusCode -eq 200) { $tamam = $true; break }
+            } catch { }
+            if ($p.HasExited) { break }
+            Start-Sleep -Seconds 1
+          }
+          if (-not $tamam) { throw "Sunucu 60 sn içinde /healthz için 200 vermedi" }
+          $ana = Invoke-WebRequest -Uri "http://127.0.0.1:8732/" -UseBasicParsing
+          if ($ana.StatusCode -ne 200 -or $ana.Content -notmatch '<div id="root">') { throw "Ana sayfa beklenen içeriği vermedi ($($ana.StatusCode))" }
+          foreach ($yol in "/app.js", "/app.css", "/api/startup") {
+            $r = Invoke-WebRequest -Uri "http://127.0.0.1:8732$yol" -UseBasicParsing
+            if ($r.StatusCode -ne 200) { throw "$yol için $($r.StatusCode)" }
+            Write-Host "$yol -> $($r.StatusCode)"
+          }
+          # Sunucu paketin kendi node.exe'siyle çalışmalı.
+          $node = Get-Process node -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $node) { throw "node süreci bulunamadı" }
+          Write-Host "Çalışan node: $($node.Path)"
+          if ($node.Path -ne (Join-Path $kok "runtime\node\node.exe")) { throw "Sunucu paketteki node.exe ile çalışmıyor: $($node.Path)" }
+          foreach ($d in "ayarlar.json", "veri\destek.sqlite") {
+            if (-not (Test-Path (Join-Path $kok $d))) { throw "İlk açılışta oluşmadı: $d" }
+          }
+          Write-Host "Hazır paket açıldı; sunucu HTTP 200 verdi."
+          Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force
+          if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
+      - name: Sunucu çıktısı
+        if: always()
+        shell: pwsh
+        run: |
+          Get-Content "$env:RUNNER_TEMP\sunucu.out.txt" -ErrorAction SilentlyContinue
+          Get-Content "$env:RUNNER_TEMP\sunucu.err.txt" -ErrorAction SilentlyContinue
+      - uses: actions/upload-artifact@v7
+        with:
+          name: destek-merkezi-windows
+          path: |
+            dist/*.zip
+            dist/*.zip.sha256
+          if-no-files-found: error
+
+  # v* etiketiyle ya da sürüm yayımlanınca zip ve .sha256 Sürümler sayfasına eklenir.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    needs: paket
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: destek-merkezi-windows
+          path: paket
+      - name: Etiket ve paket sürümü aynı mı
+        run: |
+          ls -l paket
+          SURUM="${GITHUB_REF_NAME#v}"
+          test -f "paket/destek-merkezi-${SURUM}-windows-x64.zip" || { echo "Etiket ${GITHUB_REF_NAME}, package.json sürümüyle uyuşmuyor"; exit 1; }
+          cd paket && sha256sum -c ./*.zip.sha256
+      - name: Sürüme ekle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            # Sürüm GitHub sayfasından açıldıysa dosyaları ona ekler.
+            gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber paket/*.zip paket/*.zip.sha256
+          else
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+              --title "Destek Merkezi $GITHUB_REF_NAME" \
+              --notes "Windows hazır paketi (Node.js kurulumu gerekmez). Zip'i açın, Baslat.cmd'yi çalıştırın. Değişiklikler: docs/DEGISIKLIKLER_VE_KOD_REHBERI.md" \
+              paket/*.zip paket/*.zip.sha256
+          fi
