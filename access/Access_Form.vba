@@ -17,6 +17,10 @@ Private Sub Form_Load()
     Open CurrentProject.Path & "\Sunucu_Adresi.txt" For Input As #f
     Line Input #f, ApiBase
     Close #f
+    ' Dosya Linux/GitHub zip'inden LF satir sonuyla gelebilir: Line Input LF'yi ayirmaz, adres gecersiz sayiliyordu.
+    If InStr(ApiBase, vbLf) > 0 Then ApiBase = Left$(ApiBase, InStr(ApiBase, vbLf) - 1)
+    ApiBase = Replace(ApiBase, vbCr, "")
+    If Left$(ApiBase, 3) = Chr$(239) & Chr$(187) & Chr$(191) Then ApiBase = Mid$(ApiBase, 4)
     ApiBase = Trim$(ApiBase)
     If Right$(ApiBase, 1) = "/" Then ApiBase = Left$(ApiBase, Len(ApiBase) - 1)
     If Not ValidServer() Then Err.Raise 5, , "Sunucu adresi HTTPS veya yerel 127.0.0.1 olmali."
