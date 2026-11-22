@@ -1,5 +1,14 @@
 # Destek Merkezi · Değişiklikler ve kod rehberi
 
+## Windows hazır paketi · 22 Kasım 2026 (1.7.0)
+
+- **Önceki durum:** İndiren kişinin Node.js 24 kurması, ilk açılışta internetten `npm ci` ve `npm run build` çalıştırması gerekiyordu.
+- **Şimdi:** Sürümler sayfasında `destek-merkezi-<sürüm>-windows-x64.zip` var. Zip açılır, **Baslat.cmd** çift tıklanır; Node.js kurulumu ve internet gerekmez.
+- **Yöntem:** Node.js'in resmî taşınabilir Windows zip'i (nodejs.org, sürüm ve SHA-256 `paket/paketle.ps1` içinde sabit) uygulamayla birlikte paketlenir; yalnız `node.exe` ve lisansı `runtime\node\` klasörüne girer. `Baslat.cmd` bu dosya varsa onu, yoksa bilgisayardaki Node.js'i kullanır.
+- **Neden tek dosyalı .exe (Node SEA) değil:** SEA, Node 24'te tek CommonJS giriş dosyası ister; sunucu ESM modüllerinden oluşur ve `public`, `schema.sql`, `en.json` gibi dosyaları paket köküne göre (`import.meta.url`) okur, veri, yedek ve ayarlar da kökte durur. SEA için hepsini paketleyip yolları değiştirmek gerekirdi. İmzasız tek .exe, SmartScreen ve virüs tarayıcılarında da daha sık takılır; `node.exe` ise OpenJS Foundation imzalıdır. Taşınabilir Node ile kod hiç değişmedi, Access istemcisi ve `AgaAc.cmd` aynı klasör düzeniyle çalışır.
+- **Paketleme notu:** Ayrıntı ve elle üretme: [KURULUM.md › Hazır paket nasıl üretilir](../KURULUM.md#hazır-paket-nasıl-üretilir). CI (`.github/workflows/windows-paket.yml`) paketi gerçek Windows makinesinde açıp PATH'te Node.js yokken sunucunun HTTP 200 verdiğini denetler. İzinler varsayılan `contents: read`; yalnız sürüme dosya ekleyen işte `contents: write`; `checkout` kimlik bilgisini saklamaz (`persist-credentials: false`).
+- **Node.js güncellemesi:** Güvenlik sürümü çıktığında `paket/paketle.ps1` içindeki `NodeSurum` ve `NodeSha256` birlikte güncellenip yeni sürüm yayımlanır.
+
 ## Başka cihazdan giriş HTTPS ister · 19 Kasım 2026 (1.6.0)
 
 - **Sahte IP başlığı:** Sunucu (VPS) demosunda IP başına saatlik demo alanı sınırı `CF-Connecting-IP` / `X-Forwarded-For` başlığının ilk değerinden okunuyordu; alan adı Cloudflare'den geçmiyorsa herkes bu başlığı yazıp sınırı aşabilirdi. `server/gercek-ip.mjs` başlıkları yalnız güvenilen vekilden (özel ağdaki Caddy, Cloudflare aralıkları) kabul eder. Test: `tests/gercek-ip.test.mjs`.

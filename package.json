@@ -7,7 +7,7 @@
     "xlsx": "file:vendor/xlsx-0.20.3.tgz"
   },
   "name": "destek-merkezi",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "scripts": {
     "build": "node ceviri/derle.mjs",

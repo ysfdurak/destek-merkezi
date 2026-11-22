@@ -4,12 +4,12 @@
 
 ## İlk açılış
 
-1. Kaynak paketi yazılabilir bir klasöre ayıkla ve Node.js 24 kur.
-2. Windows’ta **Baslat.cmd** dosyasını aç. İlk açılışta **npm ci** ve **npm run build** kendiliğinden çalışır (internet gerekir, bir kez yapılır). PowerShell'den açıyorsan `.\Baslat.cmd` yaz. Komut satırından başlatmak için **ayarlar.ornek.json** dosyasını **ayarlar.json** olarak kopyala ve **npm start** çalıştır. Tarayıcı otomatik açılmazsa **http://127.0.0.1:8732** adresine git.
+1. **Hazır paket (önerilen):** GitHub Sürümler sayfasındaki `destek-merkezi-<sürüm>-windows-x64.zip` dosyasını yazılabilir bir klasöre ayıkla (indirdikten sonra sağ tık › Özellikler › Engellemeyi kaldır). Node.js kurmak gerekmez: paketteki `runtime\node\node.exe` kullanılır, arayüz derlenmiş gelir. **Kaynak koddan:** kaynak paketi yazılabilir bir klasöre ayıkla ve Node.js 24 kur.
+2. Windows’ta **Baslat.cmd** dosyasını aç. Hazır pakette sunucu doğrudan açılır. Kaynak koddan ilk açılışta **npm ci** ve **npm run build** kendiliğinden çalışır (internet gerekir, bir kez yapılır). PowerShell'den açıyorsan `.\Baslat.cmd` yaz. Komut satırından başlatmak için **ayarlar.ornek.json** dosyasını **ayarlar.json** olarak kopyala ve **npm start** çalıştır. Tarayıcı otomatik açılmazsa **http://127.0.0.1:8732** adresine git.
 3. Yönetici hesabı için ad, e-posta adresi ve en az 12 karakterli parola belirle. Örnek verilerle denemeyi veya boş çalışma alanı oluşturmayı seç.
 4. Örnek alanda üstteki kullanıcı seçimiyle onay ve ret akışını dene. Boş alanda **Tanımlar ve kullanıcılar** ekranından lokasyon, en az iki bölüm, personel ve bölüm yetkilisi hesaplarını oluştur.
 
-Sunucu Node.js 24 ile çalışır. Çalışanlar kurum içi adrese tarayıcıdan bağlanır. Arayüz tarayıcıda açılır ve veritabanı **veri/destek.sqlite** dosyasında oluşur. Arka plan kuralları sunucu penceresi açıkken dakikada bir çalışır. Tarayıcıyı kapatabilirsin. Sunucuyu durdurmak için konsolda Ctrl+C kullan. Yedek almak için sunucuyu durdurup **veri** klasörünü kopyala.
+Sunucu Node.js 24 ile çalışır (hazır pakette Node.js içindedir). Çalışanlar kurum içi adrese tarayıcıdan bağlanır. Arayüz tarayıcıda açılır ve veritabanı **veri/destek.sqlite** dosyasında oluşur. Arka plan kuralları sunucu penceresi açıkken dakikada bir çalışır. Tarayıcıyı kapatabilirsin. Sunucuyu durdurmak için konsolda Ctrl+C kullan. Yedek almak için sunucuyu durdurup **veri** klasörünü kopyala.
 
 Örnek ve gerçek kullanım için ayrı klasör veya **ayarlar.json** içinde ayrı **database** yolu kullan. Yerel alan ilk kurulumdaki seçimine göre başlar. Çevrimiçi sürümdeki kayıtlar pakete dahil değildir.
 
@@ -128,3 +128,9 @@ Gönderim için sunucudan **login.microsoftonline.com** ve **graph.microsoft.com
 ## Kaynak kod
 
 **app** ve **lib** arayüzü ve iş kurallarını, **server** yerel sunucuyu ve posta kuyruğunu içerir. Önceden derlenmiş dosyalar **public** klasöründedir. Geliştirmek için Node.js 24 ile **npm ci**, **npm run build** ve **npm test** komutlarını çalıştırabilirsin.
+
+## Hazır paket nasıl üretilir
+
+`.github/workflows/windows-paket.yml` her gönderimde gerçek bir Windows makinesinde `npm ci`, `npm run build` ve **paket\paketle.ps1** çalıştırır. Betik resmî Node.js Windows zip'ini (nodejs.org, sürümü betikte sabit) indirir, SHA-256 değerini betikteki değerle karşılaştırır, tutmazsa durur. Pakete yalnız **node.exe** ve Node.js lisansı, derlenmiş **public**, **server**, **lib**, **access**, belgeler ve betikler girer; **node_modules**, **veri**, **yedek**, **ayarlar.json** ve Access dosyaları girmez. Sonra zip açılır, PATH'te Node.js yokken **Baslat.cmd** başlatılır ve sunucunun `/healthz`, `/`, `/app.js`, `/api/startup` için HTTP 200 verdiği, paketteki node.exe ile çalıştığı denetlenir. `v*` etiketi gönderildiğinde ya da sürüm yayımlandığında zip ve `.sha256` Sürümler sayfasına eklenir; etiket `package.json` sürümüyle aynı olmalıdır.
+
+Elle üretmek için (Windows, depo kökünde): `npm ci`, `npm run build`, `pwsh -File paket\paketle.ps1` → **dist** klasörü. Node.js sürümünü yükseltirken betikteki sürüm ve SHA-256 satırını birlikte değiştir (değer `https://nodejs.org/dist/v<sürüm>/SHASUMS256.txt` içindeki `win-x64.zip` satırıdır).
