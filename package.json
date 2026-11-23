@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "esbuild": "^0.28.2",
-    "lucide-react": "^1.73.0",
+    "lucide-react": "^1.77.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "xlsx": "file:vendor/xlsx-0.20.3.tgz"
