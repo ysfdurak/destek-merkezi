@@ -21,6 +21,7 @@ Docker kurulumunda uygulama düz HTTP ile `8080` portunda çalışır ve dışar
 - Giriş, ilk kurulum, parola ve e-posta kapalıdır. Yedek alınmaz.
 - Kötüye kullanımı sınırlamak için aynı anda en fazla `DEMO_MAX` alan açılabilir. Bir IP adresi de saatte en fazla `DEMO_PER_IP_HOUR` alan açabilir.
 - Demo modunda gerçek personel verisi girilmemelidir.
+- Demo sayfasına ortak ölçüm ve geri bildirim servisi (olcum.ysfdurak.com) eklenir. Yalnız ekran adı, aktif süre, cihaz türü ve dil gider. Personel, bölüm, destek kayıtları ve kişisel bilgi gitmez; çerez kullanılmaz. Yükleyici yalnız `destek.ysfdurak.com` adresinde çalışır. Kapatmak için `DEMO_OLCUM=false`. Kurum modunda bu servis hiç eklenmez ve CSP dış adrese izin vermez.
 
 **Kurum modu (`DEMO_MODE=false`):** Tek bir şirket çalışma alanı içindir. Kullanıcılar e-posta ve parolayla girer. Veri `/data/destek.sqlite` dosyasındadır, her gece `/data/backups` altına kopyası alınır.
 

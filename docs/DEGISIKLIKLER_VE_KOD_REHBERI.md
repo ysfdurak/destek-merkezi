@@ -1,5 +1,15 @@
 # Destek Merkezi · Değişiklikler ve kod rehberi
 
+## Demoda ölçüm ve geri bildirim · 23 Kasım 2026 (1.7.1)
+
+- **Ne değişti:** Herkese açık demo (`DEMO_MODE=true`) ortak ölçüm servisine bağlandı. Sayfanın sağ altında "Geri bildirim ver" düğmesi var; servis yüklenmezse düğme görünmez.
+- **Nasıl çalışıyor:**
+  - Sunucu yalnız demoda `index.html`'e `public/olcum.js`'i ekler ve CSP'de `script-src` ile `connect-src`'ye yalnız `https://olcum.ysfdurak.com`'u açar (`server/main.mjs`).
+  - Yükleyici yalnız `destek.ysfdurak.com`'da çalışır.
+  - Ekran adını uygulama bildirir: `app/ui.tsx` → `olcumKuyruk.push(['ekran', page])`.
+- **Neden böyle:** Kurum kurulumunda çalışan takibi izlenimi doğmasın diye ölçüm yalnız demoda var. Kayıt içeriği hiç gönderilmez.
+- **Test:** `tests/demo.test.mjs`. Demoda betik ve CSP eklenir; `DEMO_OLCUM=false` iken ikisi de yoktur.
+
 ## Windows hazır paketi · 22 Kasım 2026 (1.7.0)
 
 - **Önceki durum:** İndiren kişinin Node.js 24 kurması, ilk açılışta internetten `npm ci` ve `npm run build` çalıştırması gerekiyordu.

@@ -132,3 +132,22 @@ test('demo giriş sayfası arama ve paylaşım etiketleriyle döner', async t =>
   assert.match(page.text, /<link rel="canonical" href="https:\/\/destek\.ornek\.test\/">/);
   assert.match(page.text, /<meta property="og:title"/);
 });
+
+test('ölçüm servisi yalnız demoda sayfaya eklenir ve CSP yalnız o adrese izin verir', async t => {
+  const { call } = await start(t);
+  const sayfa = await call('/');
+  assert.equal(sayfa.status, 200);
+  assert.match(sayfa.text, /<script src="\/olcum\.js"><\/script>\n<script type="module" src="\/app\.js">/);
+  const csp = sayfa.headers['content-security-policy'];
+  assert.match(csp, /script-src 'self' https:\/\/olcum\.ysfdurak\.com;/);
+  assert.match(csp, /connect-src 'self' https:\/\/olcum\.ysfdurak\.com;/);
+  const yukleyici = await call('/olcum.js');
+  assert.equal(yukleyici.status, 200);
+  assert.match(yukleyici.text, /location\.hostname !== 'destek\.ysfdurak\.com'/);
+
+  const { call: kapali } = await start(t, { olcum: false });
+  const s2 = await kapali('/');
+  assert.doesNotMatch(s2.text, /olcum\.js/);
+  assert.doesNotMatch(s2.headers['content-security-policy'], /olcum/);
+  assert.equal((await kapali('/olcum.js')).status, 404);
+});

@@ -142,11 +142,17 @@ export function createApplication(config, { send = null, ownAddress = null } = {
   const accountFailed = email => { let a = accountAttempts.get(email); if (!a || a.until < Date.now()) a = { count:0, until:Date.now()+900000 }; a.count++; accountAttempts.set(email,a); };
   const fakeHash = passwordHash(randomUUID());
   const sessionTtl = 12 * 3600000;
+  // Ortak ölçüm ve geri bildirim (olcum.ysfdurak.com): yalnız herkese açık demoda. Kurum kurulumunda sayfaya
+  // eklenmez, CSP dış adrese izin vermez. DEMO_OLCUM=false ile demoda da kapatılabilir.
+  const olcum = Boolean(demo) && config.demo?.olcum !== false;
+  const OLCUM = 'https://olcum.ysfdurak.com';
+  const csp = `default-src 'self'; script-src 'self'${olcum ? ' '+OLCUM : ''}; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'${olcum ? ' '+OLCUM : ''}; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`;
   const assets = new Map([
     ['/', ['index.html','text/html; charset=utf-8']],
     ['/app.js', ['app.js','text/javascript; charset=utf-8']],
     ['/app.css', ['app.css','text/css; charset=utf-8']],
     ['/favicon.svg', ['favicon.svg','image/svg+xml']],
+    ...(olcum ? [['/olcum.js', ['olcum.js','text/javascript; charset=utf-8']]] : []),
     // Yazı tipleri sunucudan (dış adrese istek yok): DM Sans ve Manrope, SIL OFL 1.1
     ['/fonts/dm-sans-latin-wght-normal.woff2', ['fonts/dm-sans-latin-wght-normal.woff2','font/woff2']],
     ['/fonts/dm-sans-latin-ext-wght-normal.woff2', ['fonts/dm-sans-latin-ext-wght-normal.woff2','font/woff2']],
@@ -203,7 +209,7 @@ export function createApplication(config, { send = null, ownAddress = null } = {
     try {
       res.setHeader('X-Content-Type-Options','nosniff');
       res.setHeader('Referrer-Policy','same-origin');
-      res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+      res.setHeader('Content-Security-Policy',csp);
       if (req.method === 'GET' && req.url === '/healthz') {
         mainStore.db.prepare('SELECT 1').get();
         res.writeHead(200, { 'Content-Type':'text/plain; charset=utf-8', 'Cache-Control':'no-store' });
@@ -227,6 +233,7 @@ export function createApplication(config, { send = null, ownAddress = null } = {
         }
         // Herkese açık demoda (DEMO_MODE) giriş sayfasına arama ve paylaşım etiketleri eklenir. Kurum kurulumunda eklenmez.
         if (demo && file === 'index.html') body = body.toString('utf8').replace('<title>Destek Merkezi</title>', seoHead(baseUrl));
+        if (olcum && file === 'index.html') body = body.toString('utf8').replace('<script type="module" src="/app.js"></script>', '<script src="/olcum.js"></script>\n<script type="module" src="/app.js"></script>');
         res.writeHead(200, { 'Content-Type':type, 'Cache-Control':'no-cache' });
         res.end(body);
         return;
@@ -394,7 +401,7 @@ export function configFromEnv(env) {
     proxy: true,
     database: resolve(data,'destek.sqlite'),
     yedek: { acik: true, klasor: resolve(data,'backups'), saklanacak: Number(env.BACKUP_KEEP ?? 30), saat: Number(env.BACKUP_HOUR ?? 2) },
-    demo: { acik: flag('DEMO_MODE'), klasor: resolve(data,'demo'), saat: Number(env.DEMO_TTL_HOURS ?? 72), enFazla: Number(env.DEMO_MAX ?? 200), saatlikIpSiniri: Number(env.DEMO_PER_IP_HOUR ?? 10) },
+    demo: { acik: flag('DEMO_MODE'), klasor: resolve(data,'demo'), saat: Number(env.DEMO_TTL_HOURS ?? 72), enFazla: Number(env.DEMO_MAX ?? 200), saatlikIpSiniri: Number(env.DEMO_PER_IP_HOUR ?? 10), olcum: env.DEMO_OLCUM !== 'false' },
     mail: { mode: 'off' }
   };
 }
