@@ -8,6 +8,9 @@ const NAME = /^destek-\d{4}-\d{2}-\d{2}\.sqlite$/;
 // ve en yeni 'keep' kopyayı saklar. Sunucu çalışırken alınır; durdurmak gerekmez.
 export function backupWorker(store, { dir, keep = 14, hour = 2, enabled = true }) {
   const state = { last: null, error: '' };
+  // Geçersiz ayar sessizce "başarılı ama yedek yok" sonucuna dönmesin (ör. saklanacak 0 yeni kopyayı da siliyordu).
+  if (enabled && !(Number.isInteger(keep) && keep >= 1 && keep <= 3650)) throw new Error('Yedek ayarı geçersiz: saklanacak 1 ile 3650 arasında tam sayı olmalı.');
+  if (enabled && !(Number.isInteger(hour) && hour >= 0 && hour <= 23)) throw new Error('Yedek ayarı geçersiz: saat 0 ile 23 arasında tam sayı olmalı.');
   if (enabled) mkdirSync(dir, { recursive: true });
   const files = () => readdirSync(dir).filter(f => NAME.test(f)).sort();
   if (enabled && files().length) state.last = statSync(join(dir, files().at(-1))).mtime.toISOString();
