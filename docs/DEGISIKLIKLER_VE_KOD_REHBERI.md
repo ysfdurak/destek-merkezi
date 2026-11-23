@@ -1,5 +1,12 @@
 # Destek Merkezi · Değişiklikler ve kod rehberi
 
+## Yedek ayarı doğrulaması · 23 Kasım 2026 (1.7.2)
+
+- **Ne değişti:** `yedek.saklanacak` (ya da `BACKUP_KEEP`) 0 veya geçersizken sunucu açılmaz, hata verir. Önceden yedek alınıyor, hemen ardından eski kopyalarla birlikte siliniyordu; ekranda "son yedek" görünse de klasör boştu.
+- **Kural:** `saklanacak` 1–3650 arası tam sayı, `saat` 0–23 arası tam sayı. Yedek kapalıyken (`acik: false`) bu alanlara bakılmaz.
+- **Nerede:** `server/backup.mjs` başındaki iki kontrol; test `tests/v11.test.mjs` → "D13".
+- **Sorulursa:** "Neden sessizce düzeltmiyor?" — 0 bir yazım hatası da olabilir, bilinçli bir "yedek istemiyorum" da. İkisini ayırmak için açıkça hata verip `acik: false`'u gösteriyoruz.
+
 ## Demoda ölçüm ve geri bildirim · 23 Kasım 2026 (1.7.1)
 
 - **Ne değişti:** Herkese açık demo (`DEMO_MODE=true`) ortak ölçüm servisine bağlandı. Sayfanın sağ altında "Geri bildirim ver" düğmesi var; servis yüklenmezse düğme görünmez.

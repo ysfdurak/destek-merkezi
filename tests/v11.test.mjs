@@ -414,3 +414,14 @@ test('hiyerarşi: düzey adları, birimler, toplama ve filtre', async () => {
   applyAction(s, admin, 'definition', { kind: 'departments', value: { name: 'Paketleme', code: 'PAK', locationId: 'IST' } }, now);
   assert.ok(rollup(s, 2).departments.some(d => d.name === 'Atanmamış'));
 });
+
+test('D13: geçersiz yedek ayarı reddedilir (saklanacak 0 yeni yedeği de siliyordu)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'destek-yedek-ayar-'));
+  try {
+    const store = { db: { prepare: () => ({ get: () => ({}) }) }, backup() {} };
+    for (const keep of [0, -1, 1.5, NaN]) assert.throws(() => backupWorker(store, { dir, keep, hour: 2 }), /saklanacak/);
+    for (const hour of [24, -1, NaN]) assert.throws(() => backupWorker(store, { dir, keep: 3, hour }), /saat/);
+    assert.doesNotThrow(() => backupWorker(store, { dir, keep: 0, hour: 2, enabled: false }));
+    assert.doesNotThrow(() => backupWorker(store, { dir, keep: 1, hour: 0 }));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
