@@ -460,4 +460,4 @@ Gerçek bir Windows 11 bilgisayarda, yönetici olmadan çalıştırıldı:
 - **Baslat.cmd** sunucuyu açtı; https://<ip>:8732 isteği 200 ve "Destek Merkezi" sayfası döndü.
 - Sertifika doğrulamalı istek "Sertifika yetkilisi geçersiz" hatası verdi: sertifika güvenilen köklere eklenmediği için tarayıcı ilk girişte uyarı gösterir. KURULUM.md bunu anlatıyor (`sertifika.cer` cihazlara "Güvenilen kök" olarak yüklenir).
 
-**Şöyle daha iyi olur:** AgaAc bitince, sertifikayı bu bilgisayarın güvenilen köklerine eklemeyi soran isteğe bağlı bir adım (CurrentUser\Root, yönetici gerektirmez) sunucunun kendi bilgisayarındaki uyarıyı kaldırır. Diğer cihazlar için `.cer` dosyasının yolu betik sonunda yazılı kalsın.
+**Yapıldı (24 Kasım 2026):** AgaAc sonunda isteğe bağlı olarak sertifikayı bu Windows kullanıcısının güvenilen köklerine ekliyor (`-Guven` / `-Guvenme`, varsayılan soru ve "Hayır"). Neden varsayılan Hayır: kök deposuna eklemek güven kararıdır, kullanıcı bilerek seçmeli. Neden CurrentUser: yönetici gerekmez, yalnız o hesabı etkiler. Betik PowerShell 7 ayrıştırıcısıyla hatasız; kök ekleme adımı kullanıcının makinesinde onayla denenmeli (bir test daha).
