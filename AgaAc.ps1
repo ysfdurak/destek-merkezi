@@ -12,7 +12,10 @@
 # Sonra Baslat.cmd ile sunucuyu yeniden başlat. Diğer cihazlar https://<adres>:<port> adresine girer.
 param(
   [string]$Ip = "",
-  [int]$Port = 0
+  [int]$Port = 0,
+  # Sertifikayı bu Windows kullanıcısının güvenilen köklerine ekler (soru sormadan). -Guvenme ile hiç sorulmaz.
+  [switch]$Guven,
+  [switch]$Guvenme
 )
 $ErrorActionPreference = "Stop"
 Set-Location -Path $PSScriptRoot
@@ -88,6 +91,27 @@ if ($yonetici) {
   Yaz "Güvenlik duvarı: $Port portu yalnız yerel ağa açıldı." Green
 } else {
   Yaz "Güvenlik duvarı kuralı eklenmedi (yönetici değilsin). İlk açılışta Windows izin sorarsa yalnız 'Özel ağlar'ı işaretle." Yellow
+}
+
+# 7) İsteğe bağlı: bu bilgisayardaki tarayıcı da uyarı vermesin.
+#    Yalnız bu Windows kullanıcısının "Güvenilen kök" deposuna eklenir (yönetici gerekmez); Windows ayrıca onay penceresi açar.
+#    Eski Destek Merkezi kök kayıtları (aynı ad) önce kaldırılır, böylece IP değişince depo dolmaz.
+$guvenSor = -not $Guven -and -not $Guvenme
+if ($guvenSor) {
+  $cevap = Read-Host "Bu bilgisayarın tarayıcısı sertifikaya güvensin mi? Windows bir onay penceresi açar. (E/H, varsayılan H)"
+  $Guven = $cevap -match '^(e|evet|y|yes)$'
+}
+if ($Guven) {
+  try {
+    Get-ChildItem Cert:\CurrentUser\Root | Where-Object { $_.FriendlyName -like "Destek Merkezi (*" -and $_.Thumbprint -ne $cert.Thumbprint } |
+      ForEach-Object { Remove-Item -Path ("Cert:\CurrentUser\Root\" + $_.Thumbprint) -ErrorAction SilentlyContinue }
+    Import-Certificate -FilePath $cer -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+    $kok = Get-ChildItem Cert:\CurrentUser\Root | Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
+    if ($kok) {
+      $kok.FriendlyName = "Destek Merkezi ($Ip)"
+      Yaz "Bu bilgisayar sertifikaya güveniyor: https://${Ip}:$Port uyarısız açılır (tarayıcıyı yeniden başlat)." Green
+    } else { Yaz "Sertifika güvenilen köklere eklenmedi (Windows onayı verilmedi)." Yellow }
+  } catch { Yaz "Sertifika güvenilen köklere eklenemedi: $($_.Exception.Message)" Yellow }
 }
 
 Yaz ""
