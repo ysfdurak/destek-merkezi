@@ -451,3 +451,13 @@ Tarayıcıdaki kısıtlar atlatılabilir. Tarayıcı aynı `domain.mjs` dosyası
 ## Onay kartında bekleme, sorumlu ve saate etkisi (19 Kasım 2026)
 - **Ne var?** Onay kutusundaki her kartta üç kutu: **Ne zamandır bekliyor** (`submittedAt`'ten bu yana saat/gün ve gönderilme zamanı), **Kimden işlem bekleniyor** (destek alan bölüm; kart yalnız karar verebilen kullanıcıya göründüğü için "senden"), **Toplam saate etkisi** (`netHours(r) × kişi sayısı`; uyumsuzluk varsa `excludeIssues` ayarına göre "sayılmaz" ya da "uyumsuzluğa rağmen sayılır", planlanan kayıtta "gerçekleşince sayılır").
 - **Kod:** `app/ui.tsx` onay kartı (`approval-facts`), stil `app/globals.css`. Hesap kuralı `lib/domain.mjs` → `counted` ile aynıdır; kural değişirse karttaki metin de değişmeli. İngilizce karşılıklar `lib/i18n/en.json`.
+
+## Windows'ta AgaAc.cmd denemesi (24 Kasım 2026, 1.7.2 hazır paket)
+
+Gerçek bir Windows 11 bilgisayarda, yönetici olmadan çalıştırıldı:
+
+- Paket SHA256 sürüm sayfasıyla aynı. **AgaAc.cmd** tek ağ adresini (192.168.1.x) kendisi buldu, soru sormadı. `veri\sertifika.pfx` ve `veri\sertifika.cer` üretildi; **ayarlar.json** güncellendi (host 0.0.0.0, port 8732, baseUrl https://<ip>:8732, tls alanı), eskisi **ayarlar.json.yedek** oldu. Yönetici olmadığı için güvenlik duvarı kuralı eklenmedi (beklenen).
+- **Baslat.cmd** sunucuyu açtı; https://<ip>:8732 isteği 200 ve "Destek Merkezi" sayfası döndü.
+- Sertifika doğrulamalı istek "Sertifika yetkilisi geçersiz" hatası verdi: sertifika güvenilen köklere eklenmediği için tarayıcı ilk girişte uyarı gösterir. KURULUM.md bunu anlatıyor (`sertifika.cer` cihazlara "Güvenilen kök" olarak yüklenir).
+
+**Şöyle daha iyi olur:** AgaAc bitince, sertifikayı bu bilgisayarın güvenilen köklerine eklemeyi soran isteğe bağlı bir adım (CurrentUser\Root, yönetici gerektirmez) sunucunun kendi bilgisayarındaki uyarıyı kaldırır. Diğer cihazlar için `.cer` dosyasının yolu betik sonunda yazılı kalsın.
