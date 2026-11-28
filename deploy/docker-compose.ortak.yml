@@ -8,6 +8,7 @@
 name: destek
 services:
   destek:
+    init: true  # PID 1 olarak tini: alt süreçleri toplar (zombie birikmez), sinyalleri düzgün iletir
     build: ..
     container_name: destek
     env_file: ../.env
